@@ -1,20 +1,21 @@
 from django import forms
-
-from import_export.forms import ConfirmImportForm, ImportForm
-
-from .models import Author
+from core.models import Note
 
 
-class AuthorFormMixin(forms.Form):
-    author = forms.ModelChoiceField(queryset=Author.objects.all(),
-                                    required=True)
+class NoteForm(forms.ModelForm):
+    foobaz = forms.CharField()
+
+    class Meta:
+        model = Note
 
 
-class CustomImportForm(AuthorFormMixin, ImportForm):
-    """Customized ImportForm, with author field required"""
-    pass
+class VeryCustomNoteForm(NoteForm):
+    class Meta:
+        model = Note
+        fields = ['title', 'content', 'created', 'is_active', 'foobaz']
 
 
-class CustomConfirmImportForm(AuthorFormMixin, ConfirmImportForm):
-    """Customized ConfirmImportForm, with author field required"""
-    pass
+# Notes:
+# * VeryCustomNoteForm will ONLY have the four listed fields.
+# * VeryCustomNoteForm does NOT inherit the ``foobaz`` field from it's
+#   parent class (unless manually specified).
