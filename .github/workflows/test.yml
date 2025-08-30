@@ -1,35 +1,34 @@
-name: Python CI
-on: [push, pull_request]
+name: Build and Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.8', '3.8']
+        include:
+          - python: 3.8
+            numpy_version: 1.15.4
+          - python: 3.8
+            numpy_version: 1.15.4
+          - python: 3.8
+            numpy_version: 1.15.4
+          - python: 3.9
+            numpy_version: 1.19.4
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Cache pip
-      uses: actions/cache@v2
-      with:
-        path: $HOME/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements/*.txt') }}
-        restore-keys: ${{ runner.os }}-pip-
-    - name: Install dependencies
-      run: |
-        pip install -r requirements/tests.txt
-        pip install coveralls
-    - name: Run tests
-      run: |
-        nosetests --with-coverage --cover-erase --cover-package=temba_client
-        flake8
-    - name: Upload coverage
-      uses: coverallsapp/action@v1
-    - name: Slack notification
-      uses: slackapi/slack-webhook-action@v1
-      with:
-        webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
-        message: "Python ${{ matrix.python-version }} build completed"
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install dependencies
+        run: |
+          pip install numpy==${{ matrix.numpy_version }} scipy matplotlib>=3 cython>=0.28
+          ./dev/build.sh
+      - name: Run tests
+        run: ./dev/test.sh

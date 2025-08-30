@@ -1,41 +1,45 @@
-RapidPro Python Client
-======================
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1341346.svg)](https://doi.org/10.5281/zenodo.1341346)
+[![Build Status](https://travis-ci.com/raysect/source.svg?branch=master)](https://travis-ci.com/raysect/source)
 
-[![Build Status](https://travis-ci.org/rapidpro/rapidpro-python.svg?branch=master)](https://travis-ci.org/rapidpro/rapidpro-python)
-[![Coverage Status](https://coveralls.io/repos/github/rapidpro/rapidpro-python/badge.svg?branch=master)](https://coveralls.io/github/rapidpro/rapidpro-python)
-[![PyPI Release](https://img.shields.io/pypi/v/rapidpro-python.svg)](https://pypi.python.org/pypi/rapidpro-python/)
+<a name="logo"/>
+<a href="https://www.raysect.org/" target="_blank">
+<img src="https://raysect.github.io/documentation/_images/RaysectLogo_small.png" alt="Raysect Logo"></img>
+</a>
 
-Official Python client library for the [RapidPro](http://rapidpro.github.io/rapidpro/). Supports latest Python 3.
+Raysect Python Raytracing Package
+=================================
 
-Visit [here](http://rapidpro-python.readthedocs.org/) for complete documentation.
+A ray-tracing framework for optical/non-optical physics simulations.
 
-Installation
-------------
+The aims of the Raysect project are as follows:
 
-```
-pip install rapidpro-python
-```
+* develop a ray-tracer that is easy for scientists and engineers to use and extend
 
-Example
--------
+* the raytracer must be robust and high precision
 
-```python
-from temba_client.v2 import TembaClient
-client = TembaClient('rapidpro.io', 'your-api-token')
-for contact_batch in client.get_contacts(group='Reporters').iterfetches(retry_on_rate_exceed=True):
-    for contact in contact_batch:
-        print(contact.name)
-```
+The general development philosophy is ease of use trumps performance, but performance is not to be ignored.
 
-If you don't know your API token then visit the [API Explorer](http://rapidpro.io/api/v2/explorer)
+For more information, see the [documentation pages](http://www.raysect.org/).
 
-Development
------------
 
-For discussions about future development, see the [RapidPro Developers Group](https://groups.google.com/forum/#!forum/rapidpro-dev).
+![Dispersion of light passing through a prism](docs/source/demonstrations/optics/prism_720x405.png)
 
-To run the tests:
+*Caption: a simulation of Newton's classic experiment, white light being dispersed by a glass prism.*
 
-```
-nosetests --with-coverage --cover-erase --cover-package=temba_client --cover-html
-```
+
+Please note, this code is currently under heavy development and subject to change.
+
+Raysect currently only supports Linux. Windows support will come at a later stage.
+
+Please note, for legal reasons we require the copyright to any contributed code to be passed to the Raysect project. Please see CONTRIBUTING.txt in the repository.
+
+Development Team
+----------------
+
+* Dr Alex Meakins
+* Dr Matthew Carr
+
+Citing the Code
+---------------
+
+* Dr Alex Meakins, & Matthew Carr. (2018, August 7). raysect/source: v0.5.2 Release (Version v0.5.2). Zenodo. http://doi.org/10.5281/zenodo.1341376
