@@ -1,59 +1,92 @@
 name: CI
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+      - /^v\d+\.\d+(\.(\d|x)+)?(-\S*)?$/
+  pull_request:
+    branches:
+      - main
+      - /^v\d+\.\d+(\.(\d|x)+)?(-\S*)?$/
+
+env:
+  TOX_FORCE_IGNORE_OUTCOME: "false"
+
 jobs:
-  test:
-    runs-on: ubuntu-22.04
+  build:
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        python: ["3.8", "3.8", "3.8", "3.8", "pypy-3.6"]
-        django: ["2.2", "3.0", "3.1", "main"]
-        exclude:
-          - python: "3.8"
-            django: "3.0"
-          - python: "3.8"
-            django: "3.1"
-          - python: "3.8"
-            django: "main"
-        include:
-          - python: "pypy-3.6"
-            django: "2.2"
-            allow-failure: true
-          - python: "pypy-3.6"
-            django: "3.0"
-            allow-failure: true
-          - python: "pypy-3.6"
-            django: "3.1"
-            allow-failure: true
-          - python: "pypy-3.6"
-            django: "main"
-            allow-failure: true
-          - python: "3.8"
-            django: "main"
-            allow-failure: true
-          - python: "3.8"
-            django: "main"
-            allow-failure: true
-          - python: "3.8"
-            django: "main"
-            allow-failure: true
-          - python: "3.8"
-            django: "main"
-            allow-failure: true
+        python-version: [3.8, 3.8, 3.8, 3.8, pypy-3.6]
+        toxenv:
+          - lint,docs
+          - django20-py38-all
+          - django20-py38-all
+          - django20-pypy-3.6-all
+          - django21-py38-all
+          - django21-py38-all
+          - django21-py38-all
+          - django21-pypy-3.6-all
+          - django22-py38-all
+          - django22-py38-all
+          - django22-py38-all
+          - django22-pypy-3.6-all
+          - django30-py38-all
+          - django30-py38-all
+          - django30-py38-all
+          - django30-pypy-3.6-all
+          - django31-py38-all
+          - django31-py38-all
+          - django31-py38-all
+          - django31-pypy-3.6-all
+          - django31-py38-none
+          - django31-py38-amazon_ses
+          - django22-py38-all-old_urllib3
+        allow-failure: false
+    if: ${{ matrix.allow-failure == false }}
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python }}
+      - name: Checkout code
+        uses: actions/checkout@v2
+
       - name: Cache pip
         uses: actions/cache@v2
         with:
           path: ~/.cache/pip
-          key: ${{ matrix.python }}-${{ matrix.django }}
-          restore-keys: |
-            ${{ matrix.python }}-
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
+
       - name: Install dependencies
         run: |
-          pip install tox-travis
+          pip install tox
+
       - name: Run tests
-        run: tox
+        run: |
+          tox -e ${{ matrix.toxenv }}
+
+  allow-failure-job:
+    runs-on: ubuntu-latest
+    needs: build
+    if: ${{ failure() }}
+    strategy:
+      matrix:
+        python-version: [3.8]
+        toxenv: [djangoDev-py38-all]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Cache pip
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          pip install tox
+
+      - name: Run tests
+        run: |
+          tox -e ${{ matrix.toxenv }}
+          echo "Allowing failure for ${{ matrix.toxenv }}"
