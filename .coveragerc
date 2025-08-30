@@ -16,9 +16,21 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------------
 
-[aliases]
-# so that running python setup.py test invokes pytest
-test=pytest
+[run]
+branch=True
+omit=
+    metomi/isodatetime/tests
+source=
+    metomi/isodatetime
 
-[metadata]
-license_files = LICENSE
+
+[report]
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    raise NotImplementedError
+    if __name__ == .__main__.:
+    def parse_args
+omit=
+    metomi/isodatetime/tests
+precision=2

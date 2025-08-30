@@ -15,10 +15,4 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------------
-
-[aliases]
-# so that running python setup.py test invokes pytest
-test=pytest
-
-[metadata]
-license_files = LICENSE
+"""Test modules for "isodatetime"."""

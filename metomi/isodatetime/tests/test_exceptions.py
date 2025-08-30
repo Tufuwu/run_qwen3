@@ -16,9 +16,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------------
 
-[aliases]
-# so that running python setup.py test invokes pytest
-test=pytest
+import inspect
+import metomi.isodatetime.exceptions as mie
 
-[metadata]
-license_files = LICENSE
+
+def test_isodatetime_error():
+    for _, member in inspect.getmembers(mie, inspect.isclass):
+        assert issubclass(member, mie.IsodatetimeError)
