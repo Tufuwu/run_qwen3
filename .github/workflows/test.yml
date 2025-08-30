@@ -1,25 +1,23 @@
-name: Python CI
-on: [push]
+name: Python Tests
+
+on:
+  [push, pull_request]
+
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.8, 3.8]
+        python: ["3.8", "3.8"]
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: Set up Python ${{ matrix.python }}
       uses: actions/setup-python@v2
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: ${{ matrix.python }}
     - name: Install dependencies
       run: |
-        sudo apt-get update
-        sudo apt-get install -y coinor-cbc
-        pip install -r requirements.txt
-    - name: Install package
-      run: python setup.py install -q
-    - name: Lint with flake8
-      run: flake8
-    - name: Test with pytest
-      run: pytest
+        export CFLAGS="-O0"
+        pip install . --upgrade
+    - name: Run tests
+      run: ./runtests.sh
