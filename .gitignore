@@ -1,11 +1,7 @@
-*.pyc
-.vagrant
-*.egg-info
-build
+syntax:glob
+*.py[co]
+dist/
+django_picklefield.egg-info/*
+build/
+.coverage
 .tox
-dist
-.eggs
-.env
-AUTHORS
-ChangeLog
-.venv
