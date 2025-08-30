@@ -1,75 +1,28 @@
-name: CI
-on: [push, pull_request]
-
+name: Python application
+on:
+  push
+  pull_request
 jobs:
-  build:
+  build-test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        include:
-          - env: TOXENV=flake8
-          - python: 3.8
-            env: TOXENV=integration
-          - python: 3.8
-            env: TOXENV=py38-django22
-          - python: 3.8
-            env: TOXENV=py38-django22
-          - python: 3.8
-            env: TOXENV=py38-django22
-          - python: 3.8
-            env: TOXENV=py38-django22
-          - python: 3.9
-            env: TOXENV=py39-django22
-          - python: 3.8
-            env: TOXENV=py38-django30
-          - python: 3.8
-            env: TOXENV=py38-django30
-          - python: 3.8
-            env: TOXENV=py38-django30
-          - python: 3.9
-            env: TOXENV=py39-django30
-          - python: 3.8
-            env: TOXENV=py38-django31
-          - python: 3.8
-            env: TOXENV=py38-django31
-          - python: 3.8
-            env: TOXENV=py38-django31
-          - python: 3.9
-            env: TOXENV=py39-django31
-          - python: 3.8
-            env: TOXENV=py38-djangomain
-          - python: 3.8
-            env: TOXENV=py38-djangomain
-          - python: 3.8
-            env: TOXENV=py38-djangomain
-          - python: 3.9
-            env: TOXENV=py39-djangomain
+        python: ["3.8", "3.8", "3.8", "3.8"]
     steps:
-      - uses: actions/checkout@v2
-      - name: Install dependencies
-        run: |
-          pip install tox
-      - name: Run tests
-        run: tox
-
-  allow_failure:
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    strategy:
-      matrix:
-        include:
-          - python: 3.8
-            env: TOXENV=py38-djangomain
-          - python: 3.8
-            env: TOXENV=py38-djangomain
-          - python: 3.8
-            env: TOXENV=py38-djangomain
-          - python: 3.9
-            env: TOXENV=py39-djangomain
-    steps:
-      - uses: actions/checkout@v2
-      - name: Install dependencies
-        run: |
-          pip install tox
-      - name: Run tests
-        run: tox
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python }}
+    - name: Install dependencies
+      run: |
+        pip3 install .
+        pip3 install pytest
+    - name: Run tests
+      run: |
+        JUPYTER_TOKEN=secret jupyter-notebook --config=./tests/resources/jupyter_server_config.py &
+        sleep 5
+        pytest -v
+      env:
+        JUPYTER_TOKEN: secret
