@@ -1,343 +1,156 @@
-## Introduction &middot; [![Build Status](https://travis-ci.org/BenBrostoff/draftfast.svg?branch=master)](https://travis-ci.org/BenBrostoff/draftfast) &middot; [![](https://draftfast.herokuapp.com/badge.svg)](https://draftfast.herokuapp.com/)
+# django-csv-export-view
 
-![](marketing/MAIN_WORKFLOW.png)
-![](marketing/USE_CASES.png)
+A Django class-based view for CSV export.
 
-An incredibly powerful tool that automates and optimizes lineup building, allowing you to enter thousands of lineups in any DraftKings or FanDuel contest in the time it takes you to grab a coffee.
+[![Build Status](https://travis-ci.org/benkonrath/django-csv-export-view.svg?branch=master)](https://travis-ci.org/benkonrath/django-csv-export-view)
+
+## Features
+
+* Easy CSV exports by setting a Django `model` and a `fields` or `exclude` iterable
+* Works with existing class-based view mixins for access control
+* Generates Microsoft Excel friendly CSV by default
+* Proper HTTP headers set for CSV
+* Easy to override defaults as needed
+* Easy integration into Django Admin
 
 ## Installation
 
-Requires Python 3.11+.
+`pip install django-csv-export-view`
 
-```bash
-pip install draftfast
-```
+## Quick Start
 
-## Usage
-
-Example usage ([you can experiment with these examples in repl.it](https://repl.it/@BenBrostoff/AllWarlikeDemoware)):
-
+Examples:
 ```python
-from draftfast import rules
-from draftfast.optimize import run
-from draftfast.orm import Player
-from draftfast.csv_parse import salary_download
+from csv_export.views import CSVExportView
 
-# Create players for a classic DraftKings game
-player_pool = [
-    Player(name='A1', cost=5500, proj=55, pos='PG'),
-    Player(name='A2', cost=5500, proj=55, pos='PG'),
-    Player(name='A3', cost=5500, proj=55, pos='SG'),
-    Player(name='A4', cost=5500, proj=55, pos='SG'),
-    Player(name='A5', cost=5500, proj=55, pos='SF'),
-    Player(name='A6', cost=5500, proj=55, pos='SF'),
-    Player(name='A7', cost=5500, proj=55, pos='PF'),
-    Player(name='A8', cost=5500, proj=55, pos='PF'),
-    Player(name='A9', cost=5500, proj=55, pos='C'),
-    Player(name='A10', cost=5500, proj=55, pos='C'),
-]
+class DataExportView(CSVExportView):
+    model = Data
+    fields = ("field", "related", "property")
 
-roster = run(
-    rule_set=rules.DK_NBA_RULE_SET,
-    player_pool=player_pool,
-    verbose=True,
-)
+    # When using related fields you will likely want to override get_queryset() use select_related() or prefetch_related().
+    def get_queryset(self):
+        return super().get_queryset().select_related("related")
+        OR
+        return super().get_queryset().prefetch_related("related")
 
-# Or, alternatively, generate players from a CSV
-players = salary_download.generate_players_from_csvs(
-  salary_file_location='./salaries.csv',
-  game=rules.DRAFT_KINGS,
-)
+class DataExportView(CSVExportView):
+    model = Data
+    fields = ("field", "related__field", "property")
 
-roster = run(
-  rule_set=rules.DK_NBA_RULE_SET,
-  player_pool=players,
-  verbose=True,
-)
+class DataExportView(CSVExportView):
+    model = Data
+    fields = "__all__"
+
+class DataExportView(CSVExportView):
+    model = Data
+    exclude = ("id",)
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.exclude(deleted=True)
+
+class DataExportView(CSVExportView):
+    model = Data
+
+    def get_fields(self, queryset):
+        fields = ["username", "email"]
+        if self.request.user.is_superuser:
+            fields.append("birth_date")
+        return fields
 ```
 
-You can see more examples in the [`examples` directory](https://github.com/BenBrostoff/draftfast/tree/master/examples).
+`fields` / `exclude`: An iterable of field names and properties. You cannot set both `fields` and `exclude`.
+`fields` can also be `"__all__"` to export all fields. Model properties are not included when `"__all__"` is used.
+Related field can be used with `__`. Override `get_fields(self, queryset)` for custom behaviour not supported by the
+default logic.
 
-## Game Rules
+`model`: The model to use for the CSV export queryset. Override `get_queryset()` if you need a custom queryset.
 
-Optimizing for a particular game is as easy as setting the `RuleSet` (see the example above). Game rules in the library are in the table below:
+## Further Customization
 
-| League       | Site           | Reference  |
-| ------------- |:-------------:| :-----:|
-| NFL | DraftKings | `DK_NFL_RULE_SET` |
-| NFL | FanDuel | `FD_NFL_RULE_SET` |
-| NBA | DraftKings | `DK_NBA_RULE_SET` |
-| NBA | FanDuel | `FD_NBA_RULE_SET` |
-| MLB | DraftKings | `DK_MLB_RULE_SET` |
-| MLB | FanDuel | `FD_MLB_RULE_SET` |
-| WNBA | DraftKings | `DK_WNBA_RULE_SET` |
-| WNBA | FanDuel | `FD_WNBA_RULE_SET` |
-| PGA | FanDuel | `FD_PGA_RULE_SET` |
-| PGA | DraftKings | `DK_PGA_RULE_SET` |
-| PGA_CAPTAIN | DraftKings | `DK_PGA_CAPTAIN_RULE_SET` |
-| NASCAR | FanDuel | `FD_NASCAR_RULE_SET` |
-| NASCAR | DraftKings | `DK_NASCAR_RULE_SET` |
-| SOCCER | DraftKings | `DK_SOCCER_RULE_SET` |
-| EuroLeague | DraftKings | `DK_EURO_LEAGUE_RULE_SET` |
-| NHL | DraftKings | `DK_NHL_RULE_SET` |
-| NBA Pickem | DraftKings | `DK_NBA_PICKEM_RULE_SET` |
-| NFL Showdown | DraftKings | `DK_NFL_SHOWDOWN_RULE_SET` |
-| NBA Showdown | DraftKings | `DK_NBA_SHOWDOWN_RULE_SET` |
-| MLB Showdown | DraftKings | `DK_MLB_SHOWDOWN_RULE_SET` |
-| XFL | DraftKings | `DK_XFL_CLASSIC_RULE_SET` |
-| Tennis | DraftKings | `DK_TEN_CLASSIC_RULE_SET` |
-| CS:GO | DraftKings | `DK_CSGO_SHOWDOWN` |
-| F1 | DraftKings | `DK_F1_SHOWDOWN` |
-| NFL MVP | FanDuel | `FD_NFL_MVP_RULE_SET` |
-| MLB MVP | FanDuel | `FD_MLB_MVP_RULE_SET` |
-| NBA MVP | FanDuel | `FD_NBA_MVP_RULE_SET` |
-
-Note that you can also tune `draftfast` for any game of your choice even if it's not implemented in the library (PRs welcome!). Using the `RuleSet` class, you can generate your own game rules that specific number of players, salary, etc. Example:
-
+Examples:
 ```python
-from draftfast import rules
+from csv_export.views import CSVExportView
 
-golf_rules = rules.RuleSet(
-    site=rules.DRAFT_KINGS,
-    league='PGA',
-    roster_size='6',
-    position_limits=[['G', 6, 6]],
-    salary_max=50_000,
-)
+class DataExportView(CSVExportView):
+    model = Data
+    fields = "__all__"
+    header = False
+    specify_separator = False
+    filename = "data-export.csv"
+
+class DataExportView(CSVExportView):
+    model = Data
+    fields = "__all__"
+    verbose_names = False
+
+class DataExportView(CSVExportView):
+    model = Data
+    fields = "__all__"
+
+    def get_filename(self, queryset):
+        return "data-export-{!s}.csv".format(timezone.now())
 ```
 
-## Settings
+`header` - *boolean* - Default: `True`  
+Whether to include the header in the CSV.
 
-Usage example:
+`filename` - *string* - Default: Dasherized version of `verbose_name_plural` from `queryset.model`.  
+Override `get_filename(self, queryset)` if a dynamic filename is required.
 
+`specify_separator` - *boolean* - Default: `True`  
+Whether to include `sep=<sepaator>` as the first line of the CSV file. This is useful for generating Microsoft
+Excel friendly CSV.
+
+`verbose_names` - *boolean* - Default: `True`  
+Whether to use capitalized verbose column names in the header of the CSV file. If `False`, field names are used
+instead.
+
+## CSV Writer Options
+
+Example:
 ```python
-class Showdown(Roster):
-    POSITION_ORDER = {
-        'M': 0,
-        'F': 1,
-        'D': 2,
-        'GK': 3,
-    }
+from csv_export.views import CSVExportView
 
+class DataExportView(CSVExportView):
+    model = Data
+    fields = "__all__"
 
-showdown_limits = [
-    ['M', 0, 6],
-    ['F', 0, 6],
-    ['D', 0, 6],
-    ['GK', 0, 6],
-]
-
-soccer_rules = rules.RuleSet(
-    site=rules.DRAFT_KINGS,
-    league='SOCCER_SHOWDOWN',
-    roster_size=6,
-    position_limits=showdown_limits,
-    salary_max=50_000,
-    general_position_limits=[],
-)
-player_pool = salary_download.generate_players_from_csvs(
-    salary_file_location=salary_file,
-    game=rules.DRAFT_KINGS,
-)
-roster = run(
-    rule_set=soccer_rules,
-    player_pool=player_pool,
-    verbose=True,
-    roster_gen=Showdown,
-)
+    def get_csv_writer_fmtparams(self):
+        fmtparams = super().get_csv_writer_fmtparams()
+        fmtparams["delimiter"] = "|"
+        return fmtparams
 ```
 
-`PlayerPoolSettings`
+Override `get_csv_writer_fmtparams(self)` and return a dictionary of csv write format parameters. Default format
+parameters are: dialect="excel" and quoting=csv.QUOTE_ALL. See all available options in the Python docs:
 
-- `min_proj`
-- `max_proj`
-- `min_salary`
-- `max_salary`
-- `min_avg`
-- `max_avg`
+https://docs.python.org/3.9/library/csv.html#csv.writer
 
-`OptimizerSettings`
+## Django Admin Integration
 
-- `stacks` - A list of `Stack` objects. Example:
-
+Example:
 ```python
-roster = run(
-    rule_set=rules.DK_NHL_RULE_SET,
-    player_pool=player_pool,
-    verbose=True,
-    optimizer_settings=OptimizerSettings(
-        stacks=[
-            Stack(team='PHI', count=3),
-            Stack(team='FLA', count=3),
-            Stack(team='NSH', count=2),
-        ]
-    ),
-)
+from django.contrib import admin
+from csv_export.views import CSVExportView
+
+@admin.register(Data)
+class DataAdmin(admin.ModelAdmin):
+    actions = ("export_data_csv",)
+
+    def export_data_csv(self, request, queryset):
+        view = CSVExportView(queryset=queryset, fields="__all__")
+        return view.get(request)
+
+    export_data_csv.short_description = "Export CSV for selected Data records"
 ```
 
-`Stack` can also be tuned to support different combinations of positions. For NFL,
-to only specify a QB-WRs based stack of five:
+## Contributions
 
-```python
-Stack(
-    team='NE',
-    count=5,
-    stack_lock_pos=['QB'],
-    stack_eligible_pos=['WR'],
-)
-```
+Pull requests are happily accepted.
 
-- `custom_rules` - Define rules that set if / then conditions for lineups.
+## Alternatives
 
+https://github.com/django-import-export/django-import-export/
 
-For example, if two WRs from the same team are in a naturally optimized lineup, then the QB must also be in the lineup. You can find some good examples of rules in `draftfast/test/test_custom_rules.py`.
-
-```python
-from draftfast.optimize import run
-from draftfast.settings import OptimizerSettings, CustomRule
-
-# If two WRs on one team, play the QB from same team
-settings = OptimizerSettings(
-    custom_rules=[
-        CustomRule(
-            group_a=lambda p: p.pos == 'WR' and p.team == 'Patriots',
-            group_b=lambda p: p.pos == 'QB' and p.team == 'Patriots',
-            comparison=lambda sum, a, b: sum(a) + 1 <= sum(b)
-        )
-    ]
-)
-roster = run(
-    rule_set=rules.DK_NFL_RULE_SET,
-    player_pool=nfl_pool,
-    verbose=True,
-    optimizer_settings=settings,
-)
-```
-
-Another common use case is given one player is in a lineup, always play another player:
-
-```python
-from draftfast.optimize import run
-from draftfast.settings import OptimizerSettings, CustomRule
-
-# If Player A, always play Player B and vice versa
-settings = OptimizerSettings(
-    custom_rules=[
-        CustomRule(
-            group_a=lambda p: p.name == 'Tom Brady',
-            group_b=lambda p: p.name == 'Rob Gronkowski',
-            comparison=lambda sum, a, b: sum(a) == sum(b)
-        )
-    ]
-)
-roster = run(
-    rule_set=rules.DK_NFL_RULE_SET,
-    player_pool=nfl_pool,
-    verbose=True,
-    optimizer_settings=settings,
-)
-```
-
-Custom rules also don't have to make a comparison between two groups. You can say "never play these two players in the same lineup" by using the `CustomRule#comparison` property.
-
-```python
-# Never play these two players together
-settings = OptimizerSettings(
-    custom_rules=[
-        CustomRule(
-            group_a=lambda p: p,
-            group_b=lambda p: p.name == 'Devon Booker' or p.name == 'Chris Paul',
-            comparison=lambda sum, a, b: sum(b) <= 1
-        )
-    ]
-)
-roster = run(
-    rule_set=rules.DK_NBA_RULE_SET,
-    player_pool=nba_pool,
-    verbose=True,
-    optimizer_settings=settings,
-)
-```
-
-Importantly, as of this writing, passing closures into `CustomRule`s does not work (ex. `lambda p: p.team == team`),
-so dynamically generating rules is not possible. PRs welcome for a fix here, I believe this is a limitation of `ortools`.
-
-`LineupConstraints`
-
-- `locked` - list of players to lock
-- `banned` - list of players to ban
-- `groups` - list of player groups constraints. See below
-
-```python
-roster = run(
-    rule_set=rules.DK_NFL_RULE_SET,
-    player_pool=player_pool,
-    verbose=True,
-    constraints=LineupConstraints(
-        locked=['Rob Gronkowski'],
-        banned=['Mark Ingram', 'Doug Martin'],
-        groups=[
-            [('Todd Gurley', 'Melvin Gordon', 'Christian McCaffrey'), (2, 3)],
-            [('Chris Carson', 'Mike Davis'), 1],
-        ]
-    )
-)
-```
-
-- `no_offense_against_defense` - Do not allow offensive players to be matched up against defensive players in the optimized lineup. Currently only implemented for soccer, NHL, and NFL -- PRs welcome!
-
-## CSV Upload
-
-```python
-from draftfast.csv_parse import uploaders
-
-uploader = uploaders.DraftKingsNBAUploader(
-    pid_file='./pid_file.csv',
-)
-uploader.write_rosters(rosters)
-
-```
-
-## Support and Consulting
-
-DFS optimization is only one part of a sustainable strategy. Long-term DFS winners have the best:
-
-- Player projections
-- Bankroll management
-- Diversification in contests played
-- Diversification across lineups (see `draftfast.exposure`)
-- Research process
-- 1 hour before gametime lineup changes
-- ...and so much more
-
-DraftFast provides support and consulting services that can help with all of these. [Let's get in touch today](mailto:ben.brostoff@gmail.com).
-
-# Contributing
-
-Run tests or set of tests:
-
-```sh
-# All tests
-nose2
-
-# Single file
-nose2 draftfast.test.test_soccer
-
-# Single test
-nosetests draftfast.test.test_soccer.test_soccer_dk_no_opp_d
-```
-
-Run linting
-
-```
-flake8 draftfast
-```
-
-# Credits
-
-Special thanks to [swanson](https://github.com/swanson/), who authored [this repo](https://github.com/swanson/degenerate), which was the inspiration for this one.
-
-Current project maintainers:
-
-- [BenBrostoff](https://github.com/BenBrostoff)
-- [sharkiteuthis](https://github.com/sharkiteuthis)
+https://github.com/mjumbewu/django-rest-framework-csv

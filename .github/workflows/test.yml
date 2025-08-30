@@ -1,23 +1,63 @@
 name: CI
 on: [push]
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  test:
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        include:
+          - python: 3.8
+            env: TOXENV=pre-commit
+          - python: 3.8
+            env: TOXENV=py38-2.2
+          - python: 3.8
+            env: TOXENV=py38-2.2
+          - python: 3.8
+            env: TOXENV=py38-2.2
+          - python: 3.8
+            env: TOXENV=py38-2.2
+          - python: pypy-3.6
+            env: TOXENV=pypy-3.6-2.2
+          - python: 3.8
+            env: TOXENV=py38-3.0
+          - python: 3.8
+            env: TOXENV=py38-3.0
+          - python: 3.8
+            env: TOXENV=py38-3.0
+          - python: pypy-3.6
+            env: TOXENV=pypy-3.6-3.0
+          - python: 3.8
+            env: TOXENV=py38-3.1
+          - python: 3.8
+            env: TOXENV=py38-3.1
+          - python: 3.8
+            env: TOXENV=py38-3.1
+          - python: pypy-3.6
+            env: TOXENV=pypy-3.6-3.1
+          - python: 3.8
+            env: TOXENV=py38-3.2
+          - python: 3.8
+            env: TOXENV=py38-3.2
+          - python: 3.8
+            env: TOXENV=py38-3.2
+          - python: 3.9
+            env: TOXENV=py39-3.2
+          - python: pypy-3.6
+            env: TOXENV=pypy-3.6-3.2
+          - python: 3.8
+            env: TOXENV=py38-main
+            allow_failure: true
+          - python: 3.9
+            env: TOXENV=py39-main
+            allow_failure: true
+          - python: pypy-3.6
+            env: TOXENV=pypy-3.6-main
+            allow_failure: true
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python 3.9
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.9
-      - name: Install Docker
+      - name: Install dependencies
         run: |
-          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-          sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-          sudo apt-get update
-          sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
-      - name: Build Docker image
-        run: docker build -t draft-kings-fun .
+          pip install coverage tox
       - name: Run tests
-        run: |
-          docker run draft-kings-fun flake8 draftfast
-          docker run draft-kings-fun nosetests --with-coverage --cover-package=.
+        run: tox
+      - name: Upload coverage
+        run: coveralls
