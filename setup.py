@@ -1,46 +1,39 @@
 import os
-
-from setuptools import find_packages, setup
-
-NAME = "georss_ingv_centro_nazionale_terremoti_client"
-AUTHOR = "Malte Franken"
-AUTHOR_EMAIL = "coding@subspace.de"
-DESCRIPTION = "A GeoRSS client library for the INGV Centro Nazionale Terremoti (Earthquakes) feed."
-URL = (
-    "https://github.com/exxamalte/python-georss-ingv-centro-nazionale-terremoti-client"
-)
-
-REQUIRES = [
-    "georss_client>=0.14",
-]
+import re
+from setuptools import setup, find_packages
 
 
-with open("README.md", "r") as fh:
-    long_description = fh.read()
+def read(filename):
+    return open(os.path.join(os.path.dirname(__file__), filename)).read()
 
-HERE = os.path.abspath(os.path.dirname(__file__))
-VERSION = {}
-with open(os.path.join(HERE, NAME, "__version__.py")) as f:
-    exec(f.read(), VERSION)  # pylint: disable=exec-used
+
+def read_version():
+    with open('filestack/__init__.py') as f:
+        return re.search(r'__version__ = \'(.+)\'$', f.readline()).group(1)
+
 
 setup(
-    name=NAME,
-    version=VERSION["__version__"],
-    author=AUTHOR,
-    author_email=AUTHOR_EMAIL,
-    description=DESCRIPTION,
-    license="Apache-2.0",
-    long_description=long_description,
-    long_description_content_type="text/markdown",
-    url=URL,
-    packages=find_packages(exclude=("tests*",)),
-    classifiers=[
-        "Programming Language :: Python :: 3.7",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
-        "Programming Language :: Python :: 3.10",
-        "License :: OSI Approved :: Apache Software License",
-        "Operating System :: OS Independent",
+    name='filestack-python',
+    version=read_version(),
+    license='Apache 2.0',
+    description='Filestack Python SDK',
+    long_description='Visit: https://github.com/filestack/filestack-python',
+    url='https://github.com/filestack/filestack-python',
+    author='filestack.com',
+    author_email='support@filestack.com',
+    packages=find_packages(),
+    install_requires=[
+        'requests==2.24.0',
+        'trafaret==2.0.2'
     ],
-    install_requires=REQUIRES,
+    classifiers=[
+        'Development Status :: 4 - Beta',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: Apache Software License',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Topic :: Internet :: WWW/HTTP',
+    ],
 )

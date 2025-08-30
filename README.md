@@ -1,73 +1,176 @@
-# python-georss-ingv-centro-nazionale-terremoti-client
+<p align="center"><img src="logo.svg" align="center" width="100"/></p>
+<h1 align="center">Filestack Python</h1>
+<p align="center">
+  <a href="http://travis-ci.org/filestack/filestack-python">
+    <img src="https://img.shields.io/travis/filestack/filestack-python.svg">
+  </a>
+  <a href="https://pypi.python.org/pypi/filestack-python">
+    <img src="https://img.shields.io/pypi/v/filestack-python.svg">
+  </a>
+    <img src="https://img.shields.io/pypi/pyversions/filestack-python.svg">
+</p>
+This is the official Python SDK for Filestack - API and content management system that makes it easy to add powerful file uploading and transformation capabilities to any web or mobile application.
 
-[![Build Status](https://github.com/exxamalte/python-georss-ingv-centro-nazionale-terremoti-client/workflows/CI/badge.svg?branch=master)](https://github.com/exxamalte/python-georss-ingv-centro-nazionale-terremoti-client/actions?workflow=CI)
-[![codecov](https://codecov.io/gh/exxamalte/python-georss-ingv-centro-nazionale-terremoti-client/branch/master/graph/badge.svg?token=PHASSFXFVU)](https://codecov.io/gh/exxamalte/python-georss-ingv-centro-nazionale-terremoti-client)
-[![PyPi](https://img.shields.io/pypi/v/georss-ingv-centro-nazionale-terremoti-client.svg)](https://pypi.python.org/pypi/georss-ingv-centro-nazionale-terremoti-client)
-[![Version](https://img.shields.io/pypi/pyversions/georss-ingv-centro-nazionale-terremoti-client.svg)](https://pypi.python.org/pypi/georss-ingv-centro-nazionale-terremoti-client)
+## Resources
 
-This library provides convenient access to the [INGV Centro Nazionale Terremoti (Earthquakes) Feed](http://cnt.rm.ingv.it/).
+To learn more about this SDK, please visit our API Reference
 
-## Installation
-`pip install georss-ingv-centro-nazionale-terremoti-client`
+* [API Reference](https://filestack-python.readthedocs.io)
 
-## Usage
-See below for an example of how this library can be used. After instantiating 
-the feed class and supplying the required parameters, you can call `update` to 
-retrieve the feed data. The return value will be a tuple of a status code and 
-the actual data in the form of a list of specific feed entries.
+## Installing
 
-**Status Codes**
-* _UPDATE_OK_: Update went fine and data was retrieved. The library may still return empty data, for example because no entries fulfilled the filter criteria.
-* _UPDATE_OK_NO_DATA_: Update went fine but no data was retrieved, for example because the server indicated that there was not update since the last request.
-* _UPDATE_ERROR_: Something went wrong during the update
+Install ``filestack`` with pip
 
-**Supported Filters**
-
-| Filter            |                            | Description |
-|-------------------|----------------------------|-------------|
-| Radius            | `filter_radius`            | Radius in kilometers around the home coordinates in which events from feed are included. |
-| Minimum Magnitude | `filter_minimum_magnitude` | Minimum magnitude as float value. Only events with a magnitude equal or above this value are included. |
-
-**Example**
-```python
-from georss_ingv_centro_nazionale_terremoti_client import \
-    IngvCentroNazionaleTerremotiFeed
-# Home Coordinates: Latitude: 40.84, Longitude: 14.25
-# Filter radius: 200 km
-# Filter minimum magnitude: 4.0
-feed = IngvCentroNazionaleTerremotiFeed((40.84, 14.25), 
-                                        filter_radius=200, 
-                                        filter_minimum_magnitude=4.0)
-status, entries = feed.update()
+```shell
+pip install filestack-python
 ```
 
-## Feed Manager
+or directly from GitHub
 
-The Feed Manager helps managing feed updates over time, by notifying the 
-consumer of the feed about new feed entries, updates and removed entries 
-compared to the last feed update.
+```shell
+pip install git+https://github.com/filestack/filestack-python.git
+```
 
-* If the current feed update is the first one, then all feed entries will be 
-  reported as new. The feed manager will keep track of all feed entries' 
-  external IDs that it has successfully processed.
-* If the current feed update is not the first one, then the feed manager will 
-  produce three sets:
-  * Feed entries that were not in the previous feed update but are in the 
-    current feed update will be reported as new.
-  * Feed entries that were in the previous feed update and are still in the 
-    current feed update will be reported as to be updated.
-  * Feed entries that were in the previous feed update but are not in the 
-    current feed update will be reported to be removed.
-* If the current update fails, then all feed entries processed in the previous
-  feed update will be reported to be removed.
+## Quickstart
 
-After a successful update from the feed, the feed manager will provide two
-different dates:
+The Filestack SDK allows you to upload and handle filelinks using two main classes: Client and Filelink.
 
-* `last_update` will be the timestamp of the last successful update from the
-  feed. This date may be useful if the consumer of this library wants to
-  treat intermittent errors from feed updates differently.
-* `last_timestamp` will be the latest timestamp extracted from the feed data. 
-  This requires that the underlying feed data actually contains a suitable 
-  date. This date may be useful if the consumer of this library wants to 
-  process feed entries differently if they haven't actually been updated.
+### Uploading files with `filestack.Client`
+``` python
+from filestack import Client
+client = Client('<YOUR_API_KEY>')
+
+new_filelink = client.upload(filepath='path/to/file')
+print(new_filelink.url)
+```
+
+#### Uploading files using Filestack Intelligent Ingestion
+To upload files using Filestack Intelligent Ingestion, simply add `intelligent=True` argument
+```python
+new_filelink = client.upload(filepath='path/to/file', intelligent=True)
+```
+FII always uses multipart uploads. In case of network issues, it will dynamically split file parts into smaller chunks (sacrificing upload speed in favour of upload reliability).
+
+### Working with Filelinks
+Filelink objects can by created by uploading new files, or by initializing `filestack.Filelink` with already existing file handle
+```python
+from filestack import Filelink, Client
+
+client = Client('<APIKEY>')
+filelink = client.upload(filepath='path/to/file')
+filelink.url  # 'https://cdn.filestackcontent.com/FILE_HANDLE
+
+# work with previously uploaded file
+filelink = Filelink('FILE_HANDLE')
+```
+
+### Basic Filelink Functions
+
+With a Filelink, you can download to a local path or get the content of a file. You can also perform various transformations.
+
+```python
+file_content = new_filelink.get_content()
+
+size_in_bytes = new_filelink.download('/path/to/file')
+
+filelink.overwrite(filepath='path/to/new/file')
+
+filelink.resize(width=400).flip()
+
+filelink.delete()
+```
+
+### Transformations
+
+You can chain transformations on both Filelinks and external URLs. Storing transformations will return a new Filelink object.
+
+```python
+transform = client.transform_external('http://<SOME_URL>')
+new_filelink = transform.resize(width=500, height=500).flip().enhance().store()
+
+filelink = Filelink('<YOUR_HANDLE'>)
+new_filelink = filelink.resize(width=500, height=500).flip().enhance().store()
+```
+
+You can also retrieve the transformation url at any point.
+
+ ```python
+transform_candidate = client.transform_external('http://<SOME_URL>')
+transform = transform_candidate.resize(width=500, height=500).flip().enhance()
+print(transform.url)
+```
+
+### Audio/Video Convert
+
+Audio and video conversion works just like any transformation, except it returns an instance of class AudioVisual, which allows you to check the status of your video conversion, as well as get its UUID and timestamp. 
+
+```python
+av_object = filelink.av_convert(width=100, height=100)
+while (av_object.status != 'completed'):
+    print(av_object.status)
+    print(av_object.uuid)
+    print(av_object.timestamp)
+```
+
+The status property makes a call to the API to check its current status, and you can call to_filelink() once video is complete (this function checks its status first and will fail if not completed yet).
+
+```python
+filelink = av_object.to_filelink()
+```
+
+### Security Objects
+
+Security is set on Client or Filelink classes upon instantiation and is used to sign all API calls.
+
+```python
+from filestack import Security
+
+policy = {'expiry': 253381964415}  # 'expiry' is the only required key
+security = Security(policy, '<YOUR_APP_SECRET>')
+client = Client('<YOUR_API_KEY', security=security)
+
+# new Filelink object inherits security and will use for all calls
+new_filelink = client.upload(filepath='path/to/file')
+
+# you can also provide Security objects explicitly for some methods
+size_in_bytes = filelink.download(security=security)
+```
+
+You can also retrieve security details straight from the object:
+```python
+>>> policy = {'expiry': 253381964415, 'call': ['read']}
+>>> security = Security(policy, 'SECURITY-SECRET')
+>>> security.policy_b64
+'eyJjYWxsIjogWyJyZWFkIl0sICJleHBpcnkiOiAyNTMzODE5NjQ0MTV9'
+>>> security.signature
+'f61fa1effb0638ab5b6e208d5d2fd9343f8557d8a0bf529c6d8542935f77bb3c'
+```
+
+### Webhook verification
+
+You can use `filestack.helpers.verify_webhook_signature` method to make sure that the webhooks you receive are sent by Filestack.
+
+```python
+from filestack.helpers import verify_webhook_signature
+
+# webhook_data is raw content you receive
+webhook_data = b'{"action": "fp.upload", "text": {"container": "some-bucket", "url": "https://cdn.filestackcontent.com/Handle", "filename": "filename.png", "client": "Computer", "key": "key_filename.png", "type": "image/png", "size": 1000000}, "id": 50006}'
+
+result, details = verify_webhook_signature(
+    '<YOUR_WEBHOOK_SECRET>',
+    webhook_data,
+    {
+      'FS-Signature': '<SIGNATURE-FROM-REQUEST-HEADERS>',
+      'FS-Timestamp': '<TIMESTAMP-FROM-REQUEST-HEADERS>'
+    }
+)
+
+if result is True:
+    print('Webhook is valid and was generated by Filestack')
+else:
+    raise Exception(details['error'])
+```
+
+## Versioning
+
+Filestack Python SDK follows the [Semantic Versioning](http://semver.org/).
