@@ -1,16 +1,8 @@
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
-
-# Distribution / packaging
-build/
-dist/
-*.egg-info/
-.eggs/
-
-# Dev tools
-.idea
-
-# Environments
-/.venv
+*.pyc
+.*
+/svgpathtools/nonunittests
+build
+svgpathtools.egg-info
+!.travis.yml
+!/.gitignore
+!/.github
