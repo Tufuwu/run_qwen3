@@ -1,31 +1,37 @@
-name: Python tests
+name: Python CI
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - '!dependabot/*'
   pull_request:
-    branches: [ main ]
+    branches:
+      - '!dependabot/*'
 
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python: [3.8, 3.9, '3.8', 'pypy-3.6']
+        include:
+          - python: '3.8'
+          - python: '3.8'
+          - python: '3.8'
+          - python: '3.8'
+          - python: '3.8'
+          - python: pypy-3.6
+          - python: pypy-3.6
+          - python: '3.8'
+            env: OLD_CRYPTOGRAPHY=3.8.1
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python ${{ matrix.python }}
-        uses: actions/setup-python@v3
+      - name: Set up Python
+        uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python }}
-      - name: Cache pip
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip
       - name: Install dependencies
         run: |
-          pip install -U 'setuptools>=18.5' 'pip>=6.0' 'wheel'
-          pip install -e .
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
       - name: Run tests
-        run: python runtests.py
+        run: ./ci/travis.sh
+
