@@ -1,101 +1,73 @@
-![](http://media.charlesleifer.com/blog/photos/scout-logo.png)
+# wtf-peewee
 
-[scout](https://scout.readthedocs.io/en/latest/) is a RESTful search server
-written in Python. The search is powered by [SQLite's full-text search extension](http://sqlite.org/fts3.html),
-and the web application utilizes the [Flask](http://flask.pocoo.org) framework.
+this project, based on the code found in ``wtforms.ext``, provides a bridge
+between peewee models and wtforms, mapping model fields to form fields.
 
-Scout aims to be a lightweight, RESTful search server in the spirit of
-[ElasticSearch](https://www.elastic.co), powered by the SQLite full-text search
-extension. In addition to search, Scout can be used as a document database,
-supporting complex filtering operations. Arbitrary files can be attached to
-documents and downloaded through the REST API.
+## example usage:
 
-Scout is simple to use, simple to deploy and *just works*.
+first, create a couple basic models and then use the model_form class factory
+to create a form for the Entry model:
+```python
+from peewee import *
+from wtfpeewee.orm import model_form
+import wtforms
 
-Features:
+class PasswordField(TextField):
+    """ Custom-defined field example. """
+    def wtf_field(self, model, **kwargs):
+        return wtforms.PasswordField(**kwargs)
 
-* Multiple search indexes present in a single database.
-* RESTful design for easy indexing and searching.
-* Simple key-based authentication (optional).
-* Lightweight, low resource utilization, minimal setup required.
-* Store search content and arbitrary metadata.
-* Multiple result ranking algorithms, porter stemmer.
-* Besides full-text search, perform complex filtering based on metadata values.
-* Comprehensive unit-tests.
-* Supports SQLite [FTS4](http://sqlite.org/fts3.html).
-* [Documentation hosted on ReadTheDocs](https://scout.readthedocs.io/en/latest/).
+class Blog(Model):
+    name = CharField()
 
-![](https://api.travis-ci.org/coleifer/scout.svg?branch=master)
+    def __unicode__(self):
+        return self.name
 
-## Installation
+class Entry(Model):
+    blog = ForeignKeyField(Blog)
+    title = CharField()
+    body = TextField()
+    protected = PasswordField()
 
-Scout can be installed from PyPI using `pip` or from source using `git`. Should
-you install from PyPI you will run the latest version, whereas installing from
-`git` ensures you have the latest changes.
+    def __unicode__(self):
+        return self.title
 
-Alternatively, you can run `scout` using [docker](https://www.docker.com/) and
-the provided [Dockerfile](https://github.com/coleifer/scout/blob/master/docker/Dockerfile).
-
-Installation using pip:
-
-```console
-$ pip install scout
+# create a form class for use with the Entry model
+EntryForm = model_form(Entry)
 ```
 
-You can also install the latest `master` branch using pip:
+Example implementation for an "edit" view using Flask:
 
-```console
-$ pip install -e git+https://github.com/coleifer/scout.git#egg=scout
+```python
+@app.route('/entries/<int:entry_id>/', methods=['GET', 'POST'])
+def edit_entry(entry_id):
+    try:
+        entry = Entry.get(id=entry_id)
+    except Entry.DoesNotExist:
+        abort(404)
+
+    if request.method == 'POST':
+        form = EntryForm(request.form, obj=entry)
+        if form.validate():
+            form.populate_obj(entry)
+            entry.save()
+            flash('Your entry has been saved')
+    else:
+        form = EntryForm(obj=entry)
+
+    return render_template('blog/entry_edit.html', form=form, entry=entry)
 ```
+Example template for above view:
+```jinja
+{% extends "layout.html" %}
+{% block body %}
+  <h2>Edit {{ entry.title }}</h2>
 
-If you wish to install from source, first clone the code and run `setup.py install`:
-
-```console
-$ git clone https://github.com/coleifer/scout.git
-$ cd scout/
-$ python setup.py install
-```
-
-Using either of the above methods will also ensure the project's Python
-dependencies are installed: [flask](http://flask.pocoo.org) and
-[peewee](http://docs.peewee-orm.com).
-
-[Check out the documentation](https://scout.readthedocs.io/en/latest/) for more information about the project.
-
-## Running scout
-
-If you installed using `pip`, you should be able to simply run:
-
-```console
-$ scout /path/to/search-index.db
-```
-
-If you've just got a copy of the source code, you can run:
-
-```console
-$ python scout/ /path/to/search-index.db
-```
-
-## Docker
-
-To run scout using docker, you can use the provided Dockerfile or simply pull
-the `coleifer/scout` image from dockerhub:
-
-```console
-
-$ docker run -it --rm -p 9004:9004 coleifer/scout
-# scout is now running on 0.0.0.0:9004
-```
-
-Build your own image locally and run it:
-
-```console
-
-$ cd scout/docker
-$ docker build -t scout .
-$ docker run -d \
-    --name my-scout-server \
-    -p 9004:9004 \
-    -v scout-data:/data \
-    scout
+  <form method="post" action="">
+    {% for field in form %}
+      <p>{{ field.label }} {{ field }}</p>
+    {% endfor %}
+    <p><button type="submit">Submit</button></p>
+  </form>
+{% endblock %}
 ```

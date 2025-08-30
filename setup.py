@@ -1,43 +1,30 @@
-import os
-import warnings
-
 from setuptools import setup
 
-cur_dir = os.path.dirname(__file__)
-readme_file = os.path.join(cur_dir, 'README.md')
-with open(readme_file) as fh:
-    readme = fh.read()
-
-try:
-    from scout import __version__ as scout_version
-except ImportError:
-    scout_version = '0.0.0'
-    warnings.warn('Unable to determine scout library version!')
 
 setup(
-    name='scout',
-    version=scout_version,
-    url='http://github.com/coleifer/scout/',
+    name='wtf-peewee',
+    version='3.0.1',
+    url='https://github.com/coleifer/wtf-peewee/',
     license='MIT',
     author='Charles Leifer',
     author_email='coleifer@gmail.com',
-    description='scout - a lightweight search server powered by SQLite',
-    packages=['scout'],
+    description='WTForms integration for peewee models',
+    packages=['wtfpeewee'],
     zip_safe=False,
     platforms='any',
     install_requires=[
-        'flask',
-        'peewee>=3.0.0'],
+        'peewee>=3.0.0', 'wtforms',
+    ],
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Environment :: Web Environment',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
-        'Programming Language :: Python'],
-    py_modules=['scout_client'],
-    test_suite='scout.tests',
-    entry_points="""
-        [console_scripts]
-        scout=scout.server:main
-    """,
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 3',
+        'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
+        'Topic :: Software Development :: Libraries :: Python Modules'
+    ],
+    test_suite='runtests.runtests'
 )

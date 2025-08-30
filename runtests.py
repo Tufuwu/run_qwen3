@@ -2,7 +2,7 @@
 import sys
 import unittest
 
-from scout import tests
+from wtfpeewee import tests
 
 def runtests(*test_args):
     suite = unittest.TestLoader().loadTestsFromModule(tests)
