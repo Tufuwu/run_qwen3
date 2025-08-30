@@ -1,13 +1,11 @@
-name: Python CI
+name: Python 3.8 Job
 on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      TOXENV: pep8,py3
     steps:
     - uses: actions/checkout@v2
-    - name: Install dependencies
-      run: pip install -U tox
-    - name: Run tox
-      run: sudo tox
+    - uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - run: python runtest.py
