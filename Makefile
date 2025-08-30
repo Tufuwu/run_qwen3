@@ -1,5 +1,6 @@
-tests:
-	@python -c "import pytest" >/dev/null 2>&1 || (echo "error: pytest missing, run 'pip install pytest'\n" && false)
-	python -m pytest
+all:
+	@echo "Please specify target"
+	@exit 2
 
-.PHONY: tests
+customer-release:
+	python scripts/build_release.py
