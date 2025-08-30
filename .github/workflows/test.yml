@@ -1,4 +1,4 @@
-name: CI
+name: Python Tests
 on:
   push:
     branches: [ main ]
@@ -6,40 +6,51 @@ on:
     branches: [ main ]
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         include:
-          - python: "3.8"
-            env: TOXENV=py38
-          - python: "3.8"
-            env: TOXENV=py38
-          - python: "pypy-3.6"
-            env: TOXENV=pypy-3.6
-          - python: "3.8"
-            env: TOXENV=py38
-            dist: xenial
-            sudo: true
-          - python: "3.8"
-            env: TOXENV=py38
-            dist: xenial
-            sudo: true
-          - python: "3.8"
-            env: TOXENV=py39
-            dist: xenial
-            sudo: true
-        exclude:
-          - arch: ppc64le
-            python: pypy-3.6
+          - python-version: 3.8
+            toxenv: py38
+          - python-version: 3.8
+            toxenv: py38
+          - python-version: 3.8
+            toxenv: py38
+          - python-version: 3.8
+            toxenv: py38
+          - python-version: 3.8
+            toxenv: py38
+          - python-version: 3.8
+            toxenv: py39
+          - python-version: 3.8
+            toxenv: black
+          - python-version: 3.8
+            toxenv: pep8py2
+          - python-version: 3.8
+            toxenv: pep8py3
+          - python-version: 3.8
+            toxenv: doc
+    env:
+      TOXENV: ${{ matrix.toxenv }}
     steps:
-      - name: Install codecov
-        run: pip install codecov
-      - name: Install tox
-        run: pip install tox
-      - name: Run tests
-        run: tox -e $TOXENV
-      - name: Generate coverage report
-        run: tox -e coverage-report
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Cache pip
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ matrix.python-version }}
+          restore-keys: |
+            ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip setuptools
+          pip --version
+          pip install tox codecov
+      - name: Run tox
+        run: tox
       - name: Upload coverage
         run: codecov
