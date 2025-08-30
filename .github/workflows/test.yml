@@ -1,34 +1,81 @@
-name: CI
+name: CI Tests
+
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  test:
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        env: [flake8, black, elasticsearch]
+        include:
+          - python: "3.8"
+            env: "false"
+            os: ubuntu-14.04
+          - python: "3.8"
+            env: "false"
+            os: ubuntu-14.04
+          - python: "3.8"
+            env: "false"
+            os: ubuntu-14.04
+          - python: "3.8"
+            env: "false"
+            os: ubuntu-22.04
+          - python: "3.8"
+            env: "true"
+            os: ubuntu-22.04
+          - python: "3.8"
+            env: "true"
+            os: ubuntu-22.04
+          - python: "3.9"
+            env: "true"
+            os: ubuntu-22.04
+          - python: "3.8"
+            env: "true"
+            os: ubuntu-22.04
+          - python: "pypy-3.6"
+            env: "false"
+            os: ubuntu-14.04
+          - python: "3.8"
+            env: "true"
+            os: ubuntu-22.04
+        allow_failures:
+          - python: "pypy-3.6"
+            env: "true"
+            os: ubuntu-22.04
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.8
+          python-version: ${{ matrix.python }}
+
       - name: Install dependencies
         run: |
-          pip install tox
-          pip install codecov
-      - name: Start Elasticsearch
-        run: |
-          docker pull elasticsearch:7.3.2
-          docker run --name elasticsearch -e "discovery.type=single-node" -p 9200:9200 -d elasticsearch:7.3.2
-          docker ps
-          sleep 60
-        if: matrix.env == 'elasticsearch'
+          if [ "${{ matrix.env }}" = "true" ]; then
+            pip install -r requirements.txt pytest
+          fi
+          git clone https://github.com/ProgVal/irctest.git
+          echo "y" | pip uninstall limnoria || true
+
+      - name: Echo Python version
+        run: echo "Python version: ${{ matrix.python }}"
+
+      - name: Install package
+        run: python setup.py install
+
       - name: Run tests
-        run: tox -e $env
-      - name: Upload coverage
-        run: codecov
+        run: supybot-test test -v --plugins-dir=./plugins/ --no-network
+
+      - name: Run optional tests
+        if: ${{ matrix.env == 'true' && matrix.python != 'pypy-3.6' && matrix.python != '3.8' && matrix.python matches '3\.[4-9]' }}
+        run: |
+          cd irctest
+          pytest --controllers irctest.controllers.limnoria
+
