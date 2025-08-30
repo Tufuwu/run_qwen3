@@ -15,17 +15,17 @@
 import os
 import sys
 sys.path.insert(0, os.path.abspath(os.pardir))
-import graphviz
+import gsheets
 
 
 # -- Project information -----------------------------------------------------
 
-project = 'graphviz'
-copyright = '2013-2021, Sebastian Bank'
+project = 'gsheets'
+copyright = '2016-2021, Sebastian Bank'
 author = 'Sebastian Bank'
 
 # The short X.Y version
-version = '0.17.1.dev0'
+version = '0.6.dev0'
 # The full version, including alpha/beta/rc tags
 release = version
 
@@ -44,8 +44,6 @@ extensions = [
     'sphinx.ext.autosummary',
     'sphinx.ext.intersphinx',
     'sphinx.ext.napoleon',
-    'sphinx_autodoc_typehints',  # https://github.com/agronholm/sphinx-autodoc-typehints/issues/15
-    'sphinx.ext.viewcode',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -112,7 +110,7 @@ html_static_path = ['_static']
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'graphvizdoc'
+htmlhelp_basename = 'gsheetsdoc'
 
 
 # -- Options for LaTeX output ------------------------------------------------
@@ -139,7 +137,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'graphviz.tex', 'graphviz Documentation',
+    (master_doc, 'gsheets.tex', 'gsheets Documentation',
      'Sebastian Bank', 'manual'),
 ]
 
@@ -149,7 +147,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'graphviz', 'graphviz Documentation',
+    (master_doc, 'gsheets', 'gsheets Documentation',
      [author], 1)
 ]
 
@@ -160,8 +158,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'graphviz', 'graphviz Documentation',
-     author, 'graphviz', 'One line description of project.',
+    (master_doc, 'gsheets', 'gsheets Documentation',
+     author, 'gsheets', 'One line description of project.',
      'Miscellaneous'),
 ]
 
@@ -175,11 +173,3 @@ intersphinx_mapping = {
     'py': ('https://docs.python.org/2', None),
     'py3': ('https://docs.python.org/3', None),
 }
-
-# monkey patch, see https://github.com/sphinx-doc/sphinx/issues/2044
-from sphinx.ext.autodoc import ClassLevelDocumenter, InstanceAttributeDocumenter
-
-def add_directive_header(self, sig):
-    ClassLevelDocumenter.add_directive_header(self, sig)
-
-InstanceAttributeDocumenter.add_directive_header = add_directive_header

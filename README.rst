@@ -1,35 +1,37 @@
-Graphviz
-========
+gsheets
+=======
 
 |PyPI version| |License| |Supported Python| |Format|
 
 |Build| |Codecov| |Readthedocs-stable| |Readthedocs-latest|
 
-This package facilitates the creation and rendering of graph descriptions in
-the DOT_ language of the Graphviz_ graph drawing software (`upstream repo`_)
-from Python.
+``gsheets`` is a small wrapper around the `Google Sheets API`_ (v4) to provide
+more convenient access to `Google Sheets`_ from Python scripts.
 
-Create a graph object, assemble the graph by adding nodes and edges, and
-retrieve its DOT source code string. Save the source code to a file and render
-it with the Graphviz installation of your system.
+`Turn on the API`_, download an OAuth client ID as JSON file, and create a
+``Sheets`` object from it. Use its index access (``__getitem__``) to retrieve
+SpreadSheet objects by their id, or use ``.get()`` with a sheet URL.
+Iterate over the ``Sheets`` object for all spreadsheets, or fetch spreadsheets
+by title with the ``.find()`` and ``.findall()`` methods.
 
-Use the ``view`` option/method to directly inspect the resulting (PDF, PNG,
-SVG, etc.) file with its default application. Graphs can also be rendered
-and displayed within `Jupyter notebooks`_ (formerly known as
-`IPython notebooks`_,
-`example <notebook_>`_, `nbviewer <notebook-nbviewer_>`_)
-as well as the `Jupyter QtConsole`_.
+SpreadSheet objects are collections of WorkSheets, which provide access to the
+cell values via spreadsheet coordinates/slices (e.g. ``ws['A1']``) and
+zero-based cell position (e.g. ``ws.at(0, 1)``).
+
+Save WorkSheets (or all from a SpreadSheet) as CSV files with the
+``.to_csv()``-method. Create ``pandas.DataFrames`` from worksheet with the
+``.to_frame()``-method.
 
 
 Links
 -----
 
-- GitHub: https://github.com/xflr6/graphviz
-- PyPI: https://pypi.org/project/graphviz/
-- Documentation: https://graphviz.readthedocs.io
-- Changelog: https://graphviz.readthedocs.io/en/latest/changelog.html
-- Issue Tracker: https://github.com/xflr6/graphviz/issues
-- Download: https://pypi.org/project/graphviz/#files
+- GitHub: https://github.com/xflr6/gsheets
+- PyPI: https://pypi.org/project/gsheets/
+- Documentation: https://gsheets.readthedocs.io
+- Changelog: https://gsheets.readthedocs.io/en/latest/changelog.html
+- Issue Tracker: https://github.com/xflr6/gsheets/issues
+- Download: https://pypi.org/project/gsheets/#files
 
 
 Installation
@@ -39,80 +41,117 @@ This package runs under Python 3.6+, use pip_ to install:
 
 .. code:: bash
 
-    $ pip install graphviz
+    $ pip install gsheets
 
-To render the generated DOT source code, you also need to install Graphviz_
-(`download page <upstream-download_>`_,
-`archived versions <upstream-archived_>`_,
-`installation procedure for Windows <upstream-windows_>`_).
-
-Make sure that the directory containing the ``dot`` executable is on your
-systems' path.
-
-Anaconda_: see the conda-forge_ package
-`conda-forge/python-graphviz <conda-forge-python-graphviz_>`_
-(`feedstock <conda-forge-python-graphviz-feedstock_>`_),
-which should automatically ``conda install``
-`conda-forge/graphviz <conda-forge-graphviz_>`_
-(`feedstock <conda-forge-graphviz-feedstock_>`_) as dependency.
+This will also install google-api-python-client_ and its dependencies, notably
+httplib2_ and oauth2client_, as required dependencies.
 
 
 Quickstart
 ----------
 
-Create a graph object:
+Log into the `Google Developers Console`_ with the Google account whose
+spreadsheets you want to access. Create (or select) a project and enable the
+**Drive API** and **Sheets API** (under **Google Apps APIs**).
+
+Go to the **Credentials** for your project and create **New credentials** >
+**OAuth client ID** > of type **Other**. In the list of your **OAuth 2.0 client
+IDs** click **Download JSON** for the Client ID you just created. Save the
+file as ``client_secrets.json`` in your home directory (user directory).
+Another file, named ``storage.json`` in this example, will be created after
+successful authorization to cache OAuth data.
+
+On you first usage of ``gsheets`` with this file (holding the client secrets),
+your webbrowser will be opened, asking you to log in with your Google account
+to authorize this client read access to all its Google Drive files and Google
+Sheets.
+
+Create a sheets object:
 
 .. code:: python
 
-    >>> import graphviz
-    >>> dot = graphviz.Digraph(comment='The Round Table')
-    >>> dot  #doctest: +ELLIPSIS
-    <graphviz.dot.Digraph object at 0x...>
+    >>> from gsheets import Sheets
 
-Add nodes and edges:
+    >>> sheets = Sheets.from_files('~/client_secrets.json', '~/storage.json')
+    >>> sheets  #doctest: +ELLIPSIS
+    <gsheets.api.Sheets object at 0x...>
 
-.. code:: python
-
-    >>> dot.node('A', 'King Arthur')
-    >>> dot.node('B', 'Sir Bedevere the Wise')
-    >>> dot.node('L', 'Sir Lancelot the Brave')
-
-    >>> dot.edges(['AB', 'AL'])
-    >>> dot.edge('B', 'L', constraint='false')
-
-Check the generated source code:
+Fetch a spreadsheet by id or url:
 
 .. code:: python
 
-    >>> print(dot.source)  # doctest: +NORMALIZE_WHITESPACE
-    // The Round Table
-    digraph {
-        A [label="King Arthur"]
-        B [label="Sir Bedevere the Wise"]
-        L [label="Sir Lancelot the Brave"]
-        A -> B
-        A -> L
-        B -> L [constraint=false]
-    }
+    # id only
+    >>> sheets['1dR13B3Wi_KJGUJQ0BZa2frLAVxhZnbz0hpwCcWSvb20']
+    <SpreadSheet 1dR13...20 'Spam'>
 
-Save and render the source code, optionally view the result:
+    # id or url
+    >>> url = 'https://docs.google.com/spreadsheets/d/1dR13B3Wi_KJGUJQ0BZa2frLAVxhZnbz0hpwCcWSvb20'
+    >>> s = sheets.get(url)  
+    >>> s
+    <SpreadSheet 1dR13...20 'Spam'>
+
+Access worksheets and their values:
 
 .. code:: python
 
-    >>> dot.render('test-output/round-table.gv', view=True)  # doctest: +SKIP
-    'test-output/round-table.gv.pdf'
+    # first worksheet with title
+    >>> s.find('Tabellenblatt2')
+    <WorkSheet 1747240182 'Tabellenblatt2' (10x2)>
 
-.. image:: https://raw.github.com/xflr6/graphviz/master/docs/round-table.png
-    :align: center
+    # worksheet by position, cell value by index
+    >>> s.sheets[0]['A1']
+    'spam'
+
+    # worksheet by id, cell value by position
+    >>> s[1747240182].at(row=1, col=1)
+    1
+
+Dump a worksheet to a CSV file:
+
+.. code:: python
+
+    >>> s.sheets[1].to_csv('Spam.csv', encoding='utf-8', dialect='excel')
+
+Dump all worksheet to a CSV file (deriving filenames from spreadsheet and
+worksheet title):
+
+.. code:: python
+
+    >>> csv_name = lambda infos: '%(title)s - %(sheet)s.csv' % infos
+    >>> s.to_csv(make_filename=csv_name)
+
+Load the worksheet data into a pandas DataFrame (requires ``pandas``):
+
+.. code:: python
+
+    >>> s.find('Tabellenblatt2').to_frame(index_col='spam')
+          eggs
+    spam      
+    spam  eggs
+    ...
+
+``WorkSheet.to_frame()`` passes its kwargs on to ``pandas.read_csv()`` 
 
 
 See also
 --------
 
-- pygraphviz_ |--| full-blown interface wrapping the Graphviz C library with SWIG
-- graphviz-python_ |--| official Python bindings
-  (`documentation <graphviz-python-docs_>`_)
-- pydot_ |--| stable pure-Python approach, requires pyparsing
+- gsheets.py_ |--| self-containd script to dump all worksheets of a Google
+  Spreadsheet to CSV or convert any subsheet to a pandas DataFrame (Python 2
+  prototype for this library)
+- gspread_ |--| Google Spreadsheets Python API (more mature and featureful
+  Python wrapper, currently using the XML-based `legacy v3 API`_)
+- `example Jupyter notebook`_ using gspread_ to fetch a sheet into a pandas
+  DataFrame
+- df2gspread_ |--| Transfer data between Google Spreadsheets and Pandas (build
+  upon gspread_, currently Python 2 only, GPL)
+- pygsheets_ |--| Google Spreadsheets Python API v4 (v4 port of gspread_
+  providing further extensions)
+- gspread-pandas_ |--| Interact with Google Spreadsheet through Pandas DataFrames
+- pgsheets_ |--| Manipulate Google Sheets Using Pandas DataFrames (independent
+  bidirectional transfer library, using the `legacy v3 API`_, Python 3 only)
+- PyDrive_ |--| Google Drive API made easy (google-api-python-client_ wrapper
+  for the `Google Drive`_ API, currently v2) 
 
 
 License
@@ -121,33 +160,28 @@ License
 This package is distributed under the `MIT license`_.
 
 
-.. _Graphviz:  https://www.graphviz.org
-.. _DOT: https://www.graphviz.org/doc/info/lang.html
-.. _upstream repo: https://gitlab.com/graphviz/graphviz/
-.. _upstream-download: https://www.graphviz.org/download/
-.. _upstream-archived: https://www2.graphviz.org/Archive/stable/
-.. _upstream-windows: https://forum.graphviz.org/t/new-simplified-installation-procedure-on-windows/224
+.. _Google Sheets API: https://developers.google.com/sheets/
+.. _Google Sheets: https://sheets.google.com
+.. _Google Drive: https://drive.google.com
+.. _Turn on the API: https://developers.google.com/sheets/quickstart/python#step_1_turn_on_the_api_name
 
 .. _pip: https://pip.readthedocs.io
+.. _google-api-python-client: https://pypi.org/project/google-api-python-client/
+.. _httplib2: https://pypi.org/project/httplib2/
+.. _oauth2client: https://pypi.org/project/oauth2client/
+.. _rsa: https://pypi.org/project/rsa/
 
-.. _Jupyter notebooks: https://jupyter.org
-.. _IPython notebooks: https://ipython.org/notebook.html
-.. _Jupyter QtConsole: https://qtconsole.readthedocs.io
+.. _Google Developers Console: https://console.developers.google.com
 
-.. _notebook: https://github.com/xflr6/graphviz/blob/master/examples/graphviz-notebook.ipynb
-.. _notebook-nbviewer: https://nbviewer.jupyter.org/github/xflr6/graphviz/blob/master/examples/graphviz-notebook.ipynb
-
-.. _Anaconda: https://docs.anaconda.com/anaconda/install/
-.. _conda-forge: https://conda-forge.org
-.. _conda-forge-python-graphviz: https://anaconda.org/conda-forge/python-graphviz
-.. _conda-forge-python-graphviz-feedstock: https://github.com/conda-forge/python-graphviz-feedstock
-.. _conda-forge-graphviz: https://anaconda.org/conda-forge/graphviz
-.. _conda-forge-graphviz-feedstock: https://github.com/conda-forge/graphviz-feedstock
-
-.. _pygraphviz: https://pypi.org/project/pygraphviz/
-.. _graphviz-python: https://pypi.org/project/graphviz-python/
-.. _graphviz-python-docs: https://www.graphviz.org/pdf/gv.3python.pdf
-.. _pydot: https://pypi.org/project/pydot/
+.. _gsheets.py: https://gist.github.com/xflr6/57508d28adec1cd3cd047032e8d81266
+.. _gspread: https://pypi.org/project/gspread/
+.. _legacy v3 API: https://developers.google.com/google-apps/spreadsheets/
+.. _example Jupyter notebook: https://gist.github.com/egradman/3b8140930aef97f9b0e4
+.. _df2gspread: https://pypi.org/project/df2gspread/
+.. _pygsheets : https://pypi.org/project/pygsheets/
+.. _gspread-pandas: https://pypi.org/project/gspread-pandas/
+.. _pgsheets: https://pypi.org/project/pgsheets/
+.. _PyDrive: https://pypi.org/project/PyDrive/
 
 .. _MIT license: https://opensource.org/licenses/MIT
 
@@ -155,28 +189,28 @@ This package is distributed under the `MIT license`_.
 .. |--| unicode:: U+2013
 
 
-.. |PyPI version| image:: https://img.shields.io/pypi/v/graphviz.svg
-    :target: https://pypi.org/project/graphviz/
+.. |PyPI version| image:: https://img.shields.io/pypi/v/gsheets.svg
+    :target: https://pypi.org/project/gsheets/
     :alt: Latest PyPI Version
-.. |License| image:: https://img.shields.io/pypi/l/graphviz.svg
-    :target: https://pypi.org/project/graphviz/
+.. |License| image:: https://img.shields.io/pypi/l/gsheets.svg
+    :target: https://pypi.org/project/gsheets/
     :alt: License
-.. |Supported Python| image:: https://img.shields.io/pypi/pyversions/graphviz.svg
-    :target: https://pypi.org/project/graphviz/
+.. |Supported Python| image:: https://img.shields.io/pypi/pyversions/gsheets.svg
+    :target: https://pypi.org/project/gsheets/
     :alt: Supported Python Versions
-.. |Format| image:: https://img.shields.io/pypi/format/graphviz.svg
-    :target: https://pypi.org/project/graphviz/
+.. |Format| image:: https://img.shields.io/pypi/format/gsheets.svg
+    :target: https://pypi.org/project/gsheets/
     :alt: Format
 
-.. |Build| image:: https://github.com/xflr6/graphviz/actions/workflows/build.yaml/badge.svg?branch=master
-    :target: https://github.com/xflr6/graphviz/actions/workflows/build.yaml?query=branch%3Amaster
+.. |Build| image:: https://github.com/xflr6/gsheets/actions/workflows/build.yaml/badge.svg?branch=master
+    :target: https://github.com/xflr6/gsheets/actions/workflows/build.yaml?query=branch%3Amaster
     :alt: Build
-.. |Codecov| image:: https://codecov.io/gh/xflr6/graphviz/branch/master/graph/badge.svg
-    :target: https://codecov.io/gh/xflr6/graphviz
+.. |Codecov| image:: https://codecov.io/gh/xflr6/gsheets/branch/master/graph/badge.svg
+    :target: https://codecov.io/gh/xflr6/gsheets
     :alt: Codecov
-.. |Readthedocs-stable| image:: https://readthedocs.org/projects/graphviz/badge/?version=stable
-    :target: https://graphviz.readthedocs.io/en/stable/?badge=stable
+.. |Readthedocs-stable| image:: https://readthedocs.org/projects/gsheets/badge/?version=stable
+    :target: https://gsheets.readthedocs.io/en/stable/?badge=stable
     :alt: Readthedocs stable
-.. |Readthedocs-latest| image:: https://readthedocs.org/projects/graphviz/badge/?version=latest
-    :target: https://graphviz.readthedocs.io/en/latest/?badge=latest
+.. |Readthedocs-latest| image:: https://readthedocs.org/projects/gsheets/badge/?version=latest
+    :target: https://gsheets.readthedocs.io/en/latest/?badge=latest
     :alt: Readthedocs latest
