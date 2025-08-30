@@ -1,33 +1,39 @@
 name: Python CI
+
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python: [3.8, 3.8, 3.9]
+        include:
+          - { python: 3.8, env: { TOXENV: py38 } }
+          - { python: 3.8, env: { TOXENV: py38 } }
+          - { python: 3.8, env: { TOXENV: py38 } }
+          - { python: 3.8, env: { TOXENV: py38 } }
+          - { python: 3.8, env: { TOXENV: py38 } }
+          - { python: 3.8, env: { TOXENV: flake8 } }
+          - { python: 3.8, env: { TOXENV: isort } }
+          - { python: 3.8, env: { TOXENV: black } }
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Python ${{ matrix.python }}
+      - name: Set up Python
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python }}
-      - name: Conditional setuptools install
+      - name: Cache pip
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ matrix.python }}-pip
+      - name: Install dependencies
         run: |
-          if [[ ${{ matrix.python }} == "3.8" ]]; then pip install 'setuptools<=60.9.0'; fi
-      - name: Install package
-        run: python setup.py -q install
-      - name: Install linters
-        run: pip install pylint yapf pytype
-      - name: Run tests
-        run: python setup.py test
-      - name: Run pylint
-        run: pylint comment_parser
-      - name: Run pytype
-        run: pytype
-      - name: Format code with yapf
-        run: yapf -drp comment_parser
+          pip install tox
+      - name: Run tox
+        run: tox
+
