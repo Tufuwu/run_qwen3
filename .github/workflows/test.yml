@@ -1,19 +1,27 @@
-name: Python CI
-on: [push]
+name: Test Python Versions
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: [3.8, 3.8, 3.8, 3.8]
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python 3.8
+    - name: Set up Python ${{ matrix.python }}
       uses: actions/setup-python@v2
       with:
-        python-version: 3.8
+        python-version: ${{ matrix.python }}
     - name: Install dependencies
       run: |
-        sudo apt-get update
-        sudo apt install -y python3-pip
-        sudo pip3 install -r requirements.txt
-        sudo pip3 install tox
+        pip install django bs4
     - name: Run tests
-      run: tox
+      run: |
+        export PYTHONPATH=$(pwd)
+        python setup.py test
