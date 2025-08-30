@@ -1,31 +1,19 @@
-name: CI and Deploy
-on:
-  push:
-    tags:
-      - '*'
-
+name: Python CI
+on: [push]
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [3.8, pypy-3.6, 3.8, 3.8, 3.8, 3.8]
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-    - name: Set up Python
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
       uses: actions/setup-python@v2
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: 3.8
     - name: Install dependencies
       run: |
-        python setup.py build sdist
-        pip install -r requirements-dev.txt
+        sudo apt-get update
+        sudo apt install -y python3-pip
+        sudo pip3 install -r requirements.txt
+        sudo pip3 install tox
     - name: Run tests
-      run: nosetests --verbosity 2
-    - name: Deploy to PyPI
-      run: |
-        twine upload dist/*
-      env:
-        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+      run: tox
