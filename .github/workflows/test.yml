@@ -1,26 +1,30 @@
-name: Build and Check
-on: [push]
+name: Python CI
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 jobs:
-  build-check:
+  build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.8, 3.8, 3.8]
     steps:
     - uses: actions/checkout@v2
-    - name: Run link-format-chk.sh
-      run: |
-        ./scripts/link-format-chk.sh
-    - name: Generate table
-      run: |
-        ./scripts/buildtable.pl > /tmp/table.mediawiki || exit 1
-    - name: Compare current and previous commit
-      run: |
-        diff README.mediawiki /tmp/table.mediawiki | grep '^[<>] |' > /tmp/after.diff || true
-        if git checkout HEAD^ && ./scripts/buildtable.pl > /tmp/table.mediawiki 2>/dev/null; then
-          diff README.mediawiki /tmp/table.mediawiki | grep '^[<>] |' > /tmp/before.diff || true
-          newdiff=$(diff -s /tmp/before.diff /tmp/after.diff -u | grep '^+')
-          if [ -n "$newdiff" ]; then
-            echo "$newdiff"
-            exit 1
-          fi
-        else
-          echo 'Cannot build previous commit table for comparison'
-        fi
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: pip install -r dev-requirements.txt
+    - name: Run flake8
+      run: flake8 sendgrid_backend/
+    - name: Run isort
+      run: isort -c ./
+    - name: Run black
+      run: black --check ./
+    - name: Run mypy
+      run: mypy sendgrid_backend/
+    - name: Run tox
+      run: tox
