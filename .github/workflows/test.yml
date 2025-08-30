@@ -1,23 +1,26 @@
-name: CI
+name: Python Tests
 
-on: [push]
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.8", "3.8", "3.8", "3.8", "3.8", "3.8", "pypy-3.6"]
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
-      - name: Install dependencies
-        run: |
-          pip install -r requirements-dev.txt
-          pip install -e .
-      - name: Run tests
-        run: pytest pywnedpasswords/tests/
-      - name: Lint with flake8
-        run: flake8 pywnedpasswords
-      - name: Check formatting with black
-        run: black --safe --check
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Run tests
+      run: |
+        ./setconf.py --test
+        cd testcases
+        ./test.sh
