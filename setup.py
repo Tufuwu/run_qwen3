@@ -1,39 +1,55 @@
-#!/usr/bin/env python
-"""Installation script."""
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
+from setuptools import find_packages, setup
 
-import ast
-import codecs
-import os
-import re
-
-
-CURRENT_DIR = os.path.dirname(__file__)
-
-
-def get_long_description():
-    readme_path = os.path.join(CURRENT_DIR, "README.md")
-    with codecs.open(readme_path, encoding="utf8") as ld_file:
-        return ld_file.read()
-
-
-def get_version():
-    pydot_py = os.path.join(CURRENT_DIR, "src", "pydot", "__init__.py")
-    _version_re = re.compile(r"__version__\s+=\s+(?P<version>.*)")
-    with codecs.open(pydot_py, "r", encoding="utf8") as f:
-        match = _version_re.search(f.read())
-        version = match.group("version") if match is not None else '"unknown"'
-    return str(ast.literal_eval(version))
-
+with open("README.rst") as f:
+    long_description = f.read()
 
 setup(
-    name="pydot",
-    version=get_version(),
-    package_dir={"": "src"},
-    packages=["pydot"],
-    long_description=get_long_description(),
-    long_description_content_type="text/markdown",
+    name="PyFeeds",
+    version="2020.5.16",
+    description="DIY Atom feeds in times of social media and paywalls",
+    long_description=long_description,
+    long_description_content_type="text/x-rst",
+    author="Florian Preinstorfer, Lukas Anzinger",
+    author_email="florian@nblock.org, lukas@lukasanzinger.at",
+    url="https://github.com/PyFeeds/PyFeeds",
+    packages=find_packages(exclude=["tests"]),
+    include_package_data=True,
+    install_requires=[
+        "Click>=6.6",
+        "Scrapy>=2.2",
+        "bleach>=1.4.3",
+        "dateparser>=0.5.1",
+        "feedparser",
+        "lxml>=3.5.0",
+        "python-dateutil>=2.7.3",
+        "pyxdg>=0.26",
+        "readability-lxml>=0.7",
+        "scrapy-inline-requests",
+        "itemloaders",  # explicit dependency of Scrapy > 2.2.1
+    ],
+    extras_require={
+        "docs": ["sphinx", "sphinx_rtd_theme"],
+        "style": [
+            "black",
+            "doc8",
+            "flake8",
+            "isort>=5",
+            "pygments",
+            "restructuredtext_lint",
+        ],
+        "test": ["pytest"],
+    },
+    entry_points={"console_scripts": ["feeds=feeds.cli:main"]},
+    classifiers=[
+        "Development Status :: 4 - Beta",
+        "Environment :: Console",
+        "Framework :: Scrapy",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: GNU Affero General Public License v3",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Topic :: Internet :: WWW/HTTP",
+    ],
 )

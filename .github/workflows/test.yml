@@ -1,56 +1,26 @@
-name: CI
+name: Python CI
+
 on:
   push:
-    branches:
-      - main
-  pull_request:
 
 jobs:
   test:
-    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref_type == 'tag')
     runs-on: ubuntu-latest
     strategy:
       matrix:
         include:
-          - python: 3.8
-          - python: 3.9
-          - python: 3.8
-          - python: 3.9
+          - python-version: 3.8
+            toxenv: py38
+          - python-version: 3.8
+            toxenv: py38
+          - python-version: 3.8
+            toxenv: py38,docs,style
+    env:
+      TOXENV: ${{ matrix.toxenv }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Set up Python
-        uses: actions/setup-python@v2
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
         with:
-          python-version: ${{ matrix.python }}
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-      - name: Install pydot
-        run: |
-          python setup.py sdist
-          pip install dist/pydot-*.tar.gz
-      - name: Install graphviz
-        run: sudo apt-get install -y graphviz
-      - name: Run tests
-        run: |
-          cd test
-          python pydot_unittest.py
-  linter:
-    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref_type == 'tag')
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -e .[dev]
-      - name: Run black linter
-        run: |
-          black --check --diff .
+          python-version: ${{ matrix.python-version }}
+      - run: pip install tox
+      - run: tox

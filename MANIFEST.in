@@ -1,7 +1,5 @@
-include README.md
 include LICENSE
-include ChangeLog
-include requirements.txt
-include test/*_unittest.py
-include test/graphs/*.dot
-include test/my_tests/*.dot
+include README.rst
+include feeds.cfg.dist
+include scrapy.cfg
+recursive-include docs Makefile conf.py *.rst
