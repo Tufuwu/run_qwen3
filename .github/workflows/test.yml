@@ -1,4 +1,4 @@
-name: Python tests
+name: CI Pipeline
 
 on:
   push:
@@ -7,137 +7,60 @@ on:
     branches: [ main ]
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         include:
           - python: 3.8
             env:
-              DJANGO: "Django==1.11.*"
+              TOX_ENV: flake8
           - python: 3.8
             env:
-              DJANGO: "Django==2.0.*"
+              TOX_ENV: isort
           - python: 3.8
             env:
-              DJANGO: "Django==2.1.*"
+              DJANGO: dj22
           - python: 3.8
             env:
-              DJANGO: "Django==2.2.*"
+              DJANGO: dj22
           - python: 3.8
             env:
-              DJANGO: "Django==3.0.*"
+              DJANGO: dj22
           - python: 3.8
             env:
-              DJANGO: "Django==3.1.*"
+              DJANGO: dj22
           - python: 3.8
             env:
-              DJANGO: "Django==3.2.*"
+              DJANGO: dj30
           - python: 3.8
             env:
-              DJANGO: "Django==1.11.*"
+              DJANGO: dj31
           - python: 3.8
             env:
-              DJANGO: "Django==2.0.*"
-          - python: 3.8
-            env:
-              DJANGO: "Django==2.1.*"
-          - python: 3.8
-            env:
-              DJANGO: "Django==2.2.*"
-          - python: 3.8
-            env:
-              DJANGO: "Django==3.0.*"
-          - python: 3.8
-            env:
-              DJANGO: "Django==3.1.*"
-          - python: 3.8
-            env:
-              DJANGO: "Django==3.2.*"
-          - python: 3.8
-            env:
-              DJANGO: "Django==1.11.*"
-          - python: 3.8
-            env:
-              DJANGO: "Django==2.0.*"
-          - python: 3.8
-            env:
-              DJANGO: "Django==2.1.*"
-          - python: 3.8
-            env:
-              DJANGO: "Django==2.2.*"
-          - python: 3.8
-            env:
-              DJANGO: "Django==3.0.*"
-          - python: 3.8
-            env:
-              DJANGO: "Django==3.1.*"
-          - python: 3.8
-            env:
-              DJANGO: "Django==3.2.*"
-          - python: 3.8
-            env:
-              DJANGO: "Django==1.11.*"
-          - python: 3.8
-            env:
-              DJANGO: "Django==2.0.*"
-          - python: 3.8
-            env:
-              DJANGO: "Django==2.1.*"
-          - python: 3.8
-            env:
-              DJANGO: "Django==2.2.*"
-          - python: 3.8
-            env:
-              DJANGO: "Django==3.0.*"
-          - python: 3.8
-            env:
-              DJANGO: "Django==3.1.*"
-          - python: 3.8
-            env:
-              DJANGO: "Django==3.2.*"
-          - python: 3.9
-            env:
-              DJANGO: "Django==1.11.*"
-          - python: 3.9
-            env:
-              DJANGO: "Django==2.0.*"
-          - python: 3.9
-            env:
-              DJANGO: "Django==2.1.*"
-          - python: 3.9
-            env:
-              DJANGO: "Django==2.2.*"
-          - python: 3.9
-            env:
-              DJANGO: "Django==3.0.*"
-          - python: 3.9
-            env:
-              DJANGO: "Django==3.1.*"
-          - python: 3.9
-            env:
-              DJANGO: "Django==3.2.*"
-        exclude:
-          - python: 3.8
-            env:
-              DJANGO: "Django==3.0.*"
-          - python: 3.8
-            env:
-              DJANGO: "Django==3.1.*"
-          - python: 3.8
-            env:
-              DJANGO: "Django==3.2.*"
+              DJANGO: dj32
+
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
+
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python }}
+
       - name: Install dependencies
         run: |
-          pip install ${{ matrix.env.DJANGO }}
-          pip install requests
-          pip install -e .
-      - name: Run tests
-        run: python runtests.py
+          pip install coverage isort tox
+          if [[ "${{ matrix.python }}" == "3.8" ]]; then export PY_VER=py38; fi
+          if [[ "${{ matrix.python }}" == "3.8" ]]; then export PY_VER=py38; fi
+          if [[ "${{ matrix.python }}" == "3.8" ]]; then export PY_VER=py38; fi
+          if [[ "${{ matrix.python }}" == "3.8" ]]; then export PY_VER=py38; fi
+          if [[ "${DJANGO}z" != "z" ]]; then export TOX_ENV=$PY_VER; fi
 
+      - name: Run tests
+        run: tox -e $TOX_ENV
+
+      - name: Upload coverage
+        run: |
+          bash <(curl -s https://codecov.io/bash)

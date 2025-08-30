@@ -1,6 +1,3 @@
-include AUTHORS
 include LICENSE
-include CHANGELOG
 include README.rst
-recursive-include linkcheck/templates/linkcheck *
-recursive-include linkcheck/tests/media *
+recursive-exclude * *.py[co]
