@@ -1,90 +1,57 @@
-#!/usr/bin/env python
-import codecs
 import os
-import re
-import sys
-from os import path
 
 from setuptools import find_packages, setup
 
-# When creating the sdist, make sure the django.mo file also exists:
-if "sdist" in sys.argv or "develop" in sys.argv:
-    os.chdir("fluent_blogs")
-    try:
-        from django.core import management
+VERSION = __import__("import_export").__version__
 
-        management.call_command("compilemessages", stdout=sys.stderr, verbosity=1)
-    except ImportError:
-        if "sdist" in sys.argv:
-            raise
-    finally:
-        os.chdir("..")
+CLASSIFIERS = [
+    'Framework :: Django',
+    'Framework :: Django :: 2.2',
+    'Framework :: Django :: 3.1',
+    'Framework :: Django :: 3.2',
+    'Intended Audience :: Developers',
+    'License :: OSI Approved :: BSD License',
+    'Operating System :: OS Independent',
+    'Programming Language :: Python',
+    'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 3.6',
+    'Programming Language :: Python :: 3.7',
+    'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3 :: Only',
+    'Topic :: Software Development',
+]
+
+install_requires = [
+    'diff-match-patch',
+    'Django>=2.2',
+    'tablib[html,ods,xls,xlsx,yaml]>=3.0.0',
+]
 
 
-def read(*parts):
-    file_path = path.join(path.dirname(__file__), *parts)
-    return codecs.open(file_path, encoding="utf-8").read()
-
-
-def find_version(*parts):
-    version_file = read(*parts)
-    version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]", version_file, re.M)
-    if version_match:
-        return str(version_match.group(1))
-    raise RuntimeError("Unable to find version string.")
+with open(os.path.join(os.path.dirname(__file__), 'README.rst')) as f:
+    readme = f.read()
 
 
 setup(
-    name="django-fluent-blogs",
-    version=find_version("fluent_blogs", "__init__.py"),
-    license="Apache 2.0",
-    install_requires=[
-        "django-fluent-contents>=2.0.7",
-        "django-fluent-utils>=2.0.1",
-        "django-categories-i18n>=1.1.1",
-        "django-parler>=2.0.1",
-        "django-slug-preview>=1.0.4",
-        "django-tag-parser>=3.2",
-    ],
-    requires=[
-        "Django (>=2.2)",
-    ],
-    extras_require={
-        "tests": [
-            "django-fluent-pages>=2.0.7",
-            "django-wysiwyg>=0.7.1",
-        ],
-        "blogpage": ["django-fluent-pages>=2.0.7"],
-        "taggit": ["taggit", "taggit-autosuggest"],
+    name="django-import-export",
+    description="Django application and library for importing and exporting"
+                " data with included admin integration.",
+    long_description=readme,
+    version=VERSION,
+    author="Informatika Mihelac",
+    author_email="bmihelac@mihelac.org",
+    license='BSD License',
+    platforms=['OS Independent'],
+    url="https://github.com/django-import-export/django-import-export",
+    project_urls={
+        "Documentation": "https://django-import-export.readthedocs.io/en/stable/",
+        "Changelog": "https://django-import-export.readthedocs.io/en/stable/changelog.html",
     },
-    description="A blog engine with flexible block contents (based on django-fluent-contents).",
-    long_description=read("README.rst"),
-    author="Diederik van der Boor",
-    author_email="opensource@edoburu.nl",
-    url="https://github.com/edoburu/django-fluent-blogs",
-    download_url="https://github.com/edoburu/django-fluent-blogs/zipball/master",
-    packages=find_packages(),
+    packages=find_packages(exclude=["tests"]),
     include_package_data=True,
-    test_suite="runtests",
+    install_requires=install_requires,
+    python_requires=">=3.6",
+    classifiers=CLASSIFIERS,
     zip_safe=False,
-    classifiers=[
-        "Development Status :: 5 - Production/Stable",
-        "Environment :: Web Environment",
-        "Framework :: Django",
-        "Intended Audience :: Developers",
-        "License :: OSI Approved :: Apache Software License",
-        "Operating System :: OS Independent",
-        "Programming Language :: Python",
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
-        "Programming Language :: Python :: 3.8",
-        "Framework :: Django",
-        "Framework :: Django :: 2.2",
-        "Framework :: Django :: 3.1",
-        "Framework :: Django :: 3.2",
-        "Topic :: Internet :: WWW/HTTP",
-        "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
-        "Topic :: Software Development :: Libraries :: Application Frameworks",
-        "Topic :: Software Development :: Libraries :: Python Modules",
-    ],
 )

@@ -1,8 +1,6 @@
-# Windows note: folders should not end with a slash
+include LICENSE
 include AUTHORS
 include README.rst
-include LICENSE
-recursive-include fluent_blogs/static *.gif *.css
-recursive-include fluent_blogs/locale *.po *.mo
-recursive-include fluent_blogs/templates *.html
-recursive-include fluent_blogs/pagetypes/blogpage/templates *.html
+recursive-include import_export/templates *
+recursive-include import_export/locale *
+recursive-include import_export/static *
