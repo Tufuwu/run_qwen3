@@ -4,18 +4,28 @@ on:
     branches:
       - main
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python: ["3.8", "3.8", "3.8", "3.8"]
+        python-version:
+          - 3.8
+          - 3.8
+          - 3.8
+        include:
+          - python-version: 3.8
+            env: TOXENV=cover
+          - python-version: 3.8
+            env: TOXENV=black
+    env:
+      TOXENV: ${{ matrix.env }}
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python }}
-    - run: make setup
-    - run: make
-    - run: make lint
-    - run: make docs
-    - run: make travis-test
+      - name: Install dependencies
+        run: |
+          npm install -g elm
+          pip install tox-travis
+      - name: Run tests
+        run: tox
+      - name: Upload coverage
+        if: ${{ success() }}
+        run: coveralls

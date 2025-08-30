@@ -1,27 +1,10 @@
-*.py[co]
-.project
-.pydevproject
-*~
-*.db
-*.orig
-*.DS_Store
-.tox
-*.egg/*
+# Python
+*.pyc
 .eggs/
-*.egg-info/*
-build/*
-docs/_build/*
-dist/*
+webassets_elm.egg-info/
+build/
+dist/
 
-*.log
-nosetests*.xml
-
-.coverage
-coverage.xml
-coverage
-
-test.db
-.venv
-
-*.sublime-workspace
-.python-version
+# Elm
+elm-stuff/
+node_modules/
