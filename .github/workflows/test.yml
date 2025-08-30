@@ -1,30 +1,49 @@
-name: Python CI
+name: Python Tests
+
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  test:
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python-version: [3.8, 3.8, 3.8]
+        include:
+
+          - name: "Python 3.8"
+            python: 3.8
+            os: ubuntu-latest
+          - name: "Python 3.8"
+            python: 3.8
+            os: ubuntu-latest
+          - name: "Python 3.8"
+            python: 3.8
+            os: ubuntu-latest
+          - name: "Python 3.8"
+            python: 3.8
+            os: ubuntu-latest
+          - name: "Python 3.8"
+            python: 3.8
+            os: ubuntu-latest
+          - name: "Python 3.8"
+            python: 3.8
+            os: ubuntu-latest
+          - name: "Python 3.9"
+            python: 3.9
+            os: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Setup Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: pip install -r dev-requirements.txt
-    - name: Run flake8
-      run: flake8 sendgrid_backend/
-    - name: Run isort
-      run: isort -c ./
-    - name: Run black
-      run: black --check ./
-    - name: Run mypy
-      run: mypy sendgrid_backend/
-    - name: Run tox
-      run: tox
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install dependencies
+        run: pip install -e .
+      - name: Run tests
+        run: |
+          cd tests
+          python test_cvss2.py
+          python test_cvss3.py
