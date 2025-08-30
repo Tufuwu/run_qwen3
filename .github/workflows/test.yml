@@ -1,29 +1,25 @@
 name: Python CI
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python: ["3.8", "3.8", "3.8"]
+        python-version: ["3.8", "3.8", "3.8", "3.9"]
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python }}
-      uses: actions/setup-python@v2
+    - uses: actions/setup-python@v2
       with:
-        python-version: ${{ matrix.python }}
-    - name: Install Radare2
-      run: |
-        chmod +x ./scripts/install_radare2.sh
-        ./scripts/install_radare2.sh
-    - name: Install dependencies
-      run: |
-        pip install -r python/requirements_ci.txt
-        cd python && ./setup.py install
-    - name: Run tests
-      run: |
-        cd test && make tests
+        python-version: ${{ matrix.python-version }}
+    - uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ matrix.python-version }}-pip
+        restore-keys: ${{ matrix.python-version }}-
+    - run: |
+        pip install -U pip wheel coverage codecov
+        pip install -r requirements.txt pytest pytest-mock
+        python setup.py develop
+    - run: |
+        coverage run -m py.test -v tests/
+        codecov
