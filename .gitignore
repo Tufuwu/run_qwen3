@@ -1,12 +1,16 @@
-/.project
-/.pydevproject
-/.settings
-/.coverage
-/.vscode
-/build
-/coverage.xml
-/dist
-/MANIFEST
+venv/
+/static/
+
+local.cfg
+db.sqlite3
 *.pyc
-__pycache__/
-*.egg-info/
+
+.idea/
+.tox/
+MANIFEST/
+
+.coverage
+htmlcov/
+
+# ignore mobilepay api token
+stregsystem/management/commands/tokens.json
