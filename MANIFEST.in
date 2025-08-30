@@ -1,2 +1,2 @@
-include README.rst LICENSE.txt
-recursive-include fgivenx/test/baseline_images/ *.pdf
+include LICENSE
+recursive-include tests *.py
