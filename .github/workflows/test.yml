@@ -1,25 +1,29 @@
-name: CI
-on: [push]
+name: Python CI
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    services:
-      mongodb:
-        image: mongodb:latest
+  build:
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
-        python: [3.8, 3.8, 3.9, pypy-3.6]
-        django: [Django>=2.2,<2.3, Django>=3.0,<3.2, Django>=3.2,<3.3]
-    env:
-      DJANGO: ${{ matrix.django }}
+        python-version: [3.8, 3.8, 3.8]
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Install Poetry
-        run: pip install poetry
-      - name: Install dependencies
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install Node.js
         run: |
-          poetry install -q
-          poetry run pip install -q $DJANGO
-      - name: Run tests
-        run: poetry run python -m pytest
+          sudo apt-get update
+          sudo apt-get install -y nodejs
+      - name: Install jshint
+        run: npm install -g jshint
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Run make
+        run: make
