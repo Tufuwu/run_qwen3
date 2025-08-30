@@ -1,21 +1,45 @@
-name: Python CI
-on: [push]
+name: Python Tests
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python: ["3.8", "3.8", "3.8", "3.9"]
+        include:
+        - python: "3.8"
+        - python: "3.8"
+        - python: "3.8"
+        - python: "3.8"
+        - python: "3.8"
+        - python: "3.8"
+        - python: "3.8"
     steps:
+    - uses: actions/checkout@v2
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python }}
-    - name: Install dependencies
-      run: |
-        pip install -r requirements.txt
-        pip install aiosqlite
-    - name: Run tests
-      run: |
-        cd tests
-        ./test.py
+    - name: Install tox-travis
+      run: pip install tox-travis
+    - name: Run tox
+      run: tox
+
+  lint:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: lint
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install tox-travis
+      run: pip install tox-travis
+    - name: Run tox
+      run: tox

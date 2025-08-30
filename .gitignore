@@ -1,23 +1,9 @@
-*.log
-*.pyc
-# eclipse stuff
-.project
-.pydevproject
-.settings/
-# PyCharm stuff
-.idea/
-# backup files from gedit etc.
-*~
-# runtime files
-*.pid
-*.sock
-*.db
-# config files
-*.conf
-# Sphinx output
-docs/build
-# build files
-*.egg-info/
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
 build/
 dist/
-.eggs/
+*.egg-info/
