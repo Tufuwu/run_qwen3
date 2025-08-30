@@ -1,227 +1,182 @@
-The Walrus
-##########
-
-.. image:: https://circleci.com/gh/XanaduAI/thewalrus/tree/master.svg?style=svg
-    :alt: CircleCI
-    :target: https://circleci.com/gh/XanaduAI/thewalrus/tree/master
-
-.. image:: https://ci.appveyor.com/api/projects/status/9udscqldo1xd25yk/branch/master?svg=true
-    :alt: Appveyor
-    :target: https://ci.appveyor.com/project/josh146/hafnian/branch/master
-
-.. image:: https://img.shields.io/codecov/c/github/xanaduai/thewalrus/master.svg?style=flat
-    :alt: Codecov coverage
-    :target: https://codecov.io/gh/XanaduAI/thewalrus
-
-.. image:: https://img.shields.io/codacy/grade/df94d22534cf4c05b1bddcf697011a82.svg?style=flat
-    :alt: Codacy grade
-    :target: https://app.codacy.com/app/XanaduAI/thewalrus?utm_source=github.com&utm_medium=referral&utm_content=XanaduAI/thewalrus&utm_campaign=badger
-
-.. image:: https://img.shields.io/readthedocs/the-walrus.svg?style=flat
-    :alt: Read the Docs
-    :target: https://the-walrus.readthedocs.io
-
-.. image:: https://img.shields.io/pypi/pyversions/thewalrus.svg?style=flat
-    :alt: PyPI - Python Version
-    :target: https://pypi.org/project/thewalrus
-
-.. image:: https://joss.theoj.org/papers/10.21105/joss.01705/status.svg
-    :alt: JOSS - The Journal of Open Source Software
-    :target: https://doi.org/10.21105/joss.01705
-
-A library for the calculation of hafnians, Hermite polynomials and Gaussian boson sampling. For more information, please see the `documentation <https://the-walrus.readthedocs.io>`_.
-
-Features
+Graphviz
 ========
 
-* Fast calculation of hafnians, loop hafnians, and torontonians of general and certain structured matrices.
+|PyPI version| |License| |Supported Python| |Format|
 
-* An easy to use interface to use the loop hafnian for Gaussian quantum state calculations.
+|Build| |Codecov| |Readthedocs-stable| |Readthedocs-latest|
 
-* Sampling algorithms for hafnian and torontonians of graphs.
+This package facilitates the creation and rendering of graph descriptions in
+the DOT_ language of the Graphviz_ graph drawing software (`upstream repo`_)
+from Python.
 
-* Efficient classical methods for approximating the hafnian of non-negative matrices.
+Create a graph object, assemble the graph by adding nodes and edges, and
+retrieve its DOT source code string. Save the source code to a file and render
+it with the Graphviz installation of your system.
 
-* Easy to use implementations of the multidimensional Hermite polynomials, which can also be used to calculate hafnians of all reductions of a given matrix.
+Use the ``view`` option/method to directly inspect the resulting (PDF, PNG,
+SVG, etc.) file with its default application. Graphs can also be rendered
+and displayed within `Jupyter notebooks`_ (formerly known as
+`IPython notebooks`_,
+`example <notebook_>`_, `nbviewer <notebook-nbviewer_>`_)
+as well as the `Jupyter QtConsole`_.
+
+
+Links
+-----
+
+- GitHub: https://github.com/xflr6/graphviz
+- PyPI: https://pypi.org/project/graphviz/
+- Documentation: https://graphviz.readthedocs.io
+- Changelog: https://graphviz.readthedocs.io/en/latest/changelog.html
+- Issue Tracker: https://github.com/xflr6/graphviz/issues
+- Download: https://pypi.org/project/graphviz/#files
 
 
 Installation
-============
+------------
 
-Pre-built binary wheels are available for the following platforms:
+This package runs under Python 3.6+, use pip_ to install:
 
-+------------+-------------+------------------+---------------+
-|            | macOS 10.6+ | manylinux x86_64 | Windows 64bit |
-+============+=============+==================+===============+
-| Python 3.6 |      X      |        X         |       X       |
-+------------+-------------+------------------+---------------+
-| Python 3.7 |      X      |        X         |       X       |
-+------------+-------------+------------------+---------------+
-| Python 3.8 |      X      |        X         |       X       |
-+------------+-------------+------------------+---------------+
+.. code:: bash
 
-To install, simply run
+    $ pip install graphviz
 
-.. code-block:: bash
+To render the generated DOT source code, you also need to install Graphviz_
+(`download page <upstream-download_>`_,
+`archived versions <upstream-archived_>`_,
+`installation procedure for Windows <upstream-windows_>`_).
 
-    pip install thewalrus
+Make sure that the directory containing the ``dot`` executable is on your
+systems' path.
 
+Anaconda_: see the conda-forge_ package
+`conda-forge/python-graphviz <conda-forge-python-graphviz_>`_
+(`feedstock <conda-forge-python-graphviz-feedstock_>`_),
+which should automatically ``conda install``
+`conda-forge/graphviz <conda-forge-graphviz_>`_
+(`feedstock <conda-forge-graphviz-feedstock_>`_) as dependency.
 
-Compiling from source
-=====================
 
-The Walrus depends on the following Python packages:
+Quickstart
+----------
 
-* `Python <http://python.org/>`_ >= 3.6
-* `NumPy <http://numpy.org/>`_  >= 1.13.3
-* `Numba <https://numba.pydata.org/>`_ >= 0.43.1
+Create a graph object:
 
-In addition, to compile the C++ extension, the following dependencies are required:
+.. code:: python
 
-* A C++11 compiler, such as ``g++`` >= 4.8.1, ``clang`` >= 3.3, ``MSVC`` >= 14.0/2015
-* `Eigen3 <http://eigen.tuxfamily.org/index.php?title=Main_Page>`_ - a C++ header library for linear algebra.
-* `Cython <https://cython.org/>`_ an optimising static compiler for the Python programming language.
+    >>> import graphviz
+    >>> dot = graphviz.Digraph(comment='The Round Table')
+    >>> dot  #doctest: +ELLIPSIS
+    <graphviz.dot.Digraph object at 0x...>
 
-On Debian-based systems, these can be installed via ``apt`` and ``curl``:
+Add nodes and edges:
 
-.. code-block:: console
+.. code:: python
 
-    $ sudo apt install g++ libeigen3-dev
-    $ pip install Cython
+    >>> dot.node('A', 'King Arthur')
+    >>> dot.node('B', 'Sir Bedevere the Wise')
+    >>> dot.node('L', 'Sir Lancelot the Brave')
 
-or using Homebrew on MacOS:
+    >>> dot.edges(['AB', 'AL'])
+    >>> dot.edge('B', 'L', constraint='false')
 
-.. code-block:: console
+Check the generated source code:
 
-    $ brew install gcc eigen
-    $ pip install Cython
+.. code:: python
 
-Alternatively, you can download the Eigen headers manually:
+    >>> print(dot.source)  # doctest: +NORMALIZE_WHITESPACE
+    // The Round Table
+    digraph {
+        A [label="King Arthur"]
+        B [label="Sir Bedevere the Wise"]
+        L [label="Sir Lancelot the Brave"]
+        A -> B
+        A -> L
+        B -> L [constraint=false]
+    }
 
-.. code-block:: console
+Save and render the source code, optionally view the result:
 
-    $ mkdir ~/.local/eigen3 && cd ~/.local/eigen3
-    $ wget https://gitlab.com/libeigen/eigen/-/archive/3.3.7/eigen-3.3.7.tar.gz -O eigen3.tar.gz
-    $ tar xzf eigen3.tar.gz eigen-eigen-323c052e1731/Eigen --strip-components 1
-    $ export EIGEN_INCLUDE_DIR=$HOME/.local/eigen3
+.. code:: python
 
-Note that we export the environment variable ``EIGEN_INCLUDE_DIR`` so that The Walrus can find the Eigen3 header files (if not provided, The Walrus will by default look in ``/use/include/eigen3`` and ``/usr/local/include/eigen3``).
+    >>> dot.render('test-output/round-table.gv', view=True)  # doctest: +SKIP
+    'test-output/round-table.gv.pdf'
 
-You can compile the latest development version by cloning the git repository, and installing using pip in development mode.
+.. image:: https://raw.github.com/xflr6/graphviz/master/docs/round-table.png
+    :align: center
 
-.. code-block:: console
 
-    $ git clone https://github.com/XanaduAI/thewalrus.git
-    $ cd thewalrus && python -m pip install -e .
+See also
+--------
 
-
-OpenMP
-------
-
-``libwalrus`` uses OpenMP to parallelize both the permanent and the hafnian calculation. **At the moment, this is only supported on Linux using the GNU g++ compiler, due to insufficient support using Windows/MSCV and MacOS/Clang.**
-
-
-
-Using LAPACK, OpenBLAS, or MKL
-------------------------------
-
-If you would like to take advantage of the highly optimized matrix routines of LAPACK, OpenBLAS, or MKL, you can optionally compile the ``libwalrus`` such that Eigen uses these frameworks as backends. As a result, all calls in the ``libwalrus`` library to Eigen functions are silently substituted with calls to LAPACK/OpenBLAS/MKL.
-
-For example, for LAPACK integration, make sure you have the ``lapacke`` C++ LAPACK bindings installed (``sudo apt install liblapacke-dev`` in Ubuntu-based Linux distributions), and then compile with the environment variable ``USE_LAPACK=1``:
-
-.. code-block:: console
-
-    $ USE_LAPACK=1 python -m pip install thewalrus --no-binary :all:
-
-Alternatively, you may pass ``USE_OPENBLAS=1`` to use the OpenBLAS library.
-
-
-Software tests
-==============
-
-To ensure that The Walrus library is working correctly after installation, the test suite can be run by navigating to the source code folder and running
-
-.. code-block:: console
-
-    $ make test
-
-To run the low-level C++ test suite, `Googletest <https://github.com/google/googletest>`_
-will need to be installed. In Ubuntu-based distributions, this can be done as follows:
-
-.. code-block:: console
-
-    sudo apt-get install cmake libgtest-dev
-
-Alternatively, the latest Googletest release can be installed from source:
-
-.. code-block:: console
-
-    sudo apt install cmake
-    wget -qO - https://github.com/google/googletest/archive/release-1.8.1.tar.gz | tar -xz
-    cmake -D CMAKE_INSTALL_PREFIX:PATH=$HOME/googletest -D CMAKE_BUILD_TYPE=Release googletest-release-1.8.1
-    make install
-
-If installing Googletest from source, make sure that the included headers and
-libraries are available on your include/library paths.
-
-Documentation
-=============
-
-The Walrus documentation is available online on `Read the Docs <https://the-walrus.readthedocs.io>`_.
-
-To build it locally, you need to have the following packages installed:
-
-* `Sphinx <http://sphinx-doc.org/>`_ >= 1.5
-* `sphinxcontrib-bibtex <https://sphinxcontrib-bibtex.readthedocs.io/en/latest/>`_ >= 0.3.6
-* `nbsphinx <https://github.com/spatialaudio/nbsphinx>`_
-* `Pandoc <https://pandoc.org/>`_
-* `breathe <https://breathe.readthedocs.io/en/latest/>`_ >= 4.12.0
-* `exhale <https://exhale.readthedocs.io/en/latest/>`_
-* `Doxygen <http://www.doxygen.nl/>`_
-
-They can be installed via a combination of ``pip`` and ``apt`` if on a Debian-based system:
-::
-
-    $ sudo apt install pandoc doxygen
-    $ pip3 install sphinx sphinxcontrib-bibtex nbsphinx breathe exhale
-
-To build the HTML documentation, go to the top-level directory and run the command
-
-.. code-block:: console
-
-    $ make doc
-
-The documentation can then be found in the ``docs/_build/html/`` directory.
-
-Contributing to The Walrus
-==========================
-
-We welcome contributions - simply fork The Walrus repository, and then make a pull request containing your contribution. All contributors to The Walrus will be listed as authors on the releases.
-
-We also encourage bug reports, suggestions for new features and enhancements, and even links to projects, applications or scientific publications that use The Walrus.
-
-Authors
-=======
-
-Brajesh Gupt, Josh Izaac and Nicolas Quesada.
-
-All contributions are acknowledged in the `acknowledgments page <https://github.com/XanaduAI/thewalrus/blob/master/.github/ACKNOWLEDGMENTS.md>`_.
-
-If you are doing research using The Walrus, please cite `our paper <https://joss.theoj.org/papers/10.21105/joss.01705>`_:
-
- Brajesh Gupt, Josh Izaac and Nicolas Quesada. The Walrus: a library for the calculation of hafnians, Hermite polynomials and Gaussian boson sampling. Journal of Open Source Software, 4(44), 1705 (2019)
-
-
-Support
-=======
-
-- **Source Code:** https://github.com/XanaduAI/thewalrus
-- **Issue Tracker:** https://github.com/XanaduAI/thewalrus/issues
-
-If you are having issues, please let us know by posting the issue on our Github issue tracker.
+- pygraphviz_ |--| full-blown interface wrapping the Graphviz C library with SWIG
+- graphviz-python_ |--| official Python bindings
+  (`documentation <graphviz-python-docs_>`_)
+- pydot_ |--| stable pure-Python approach, requires pyparsing
 
 
 License
-=======
+-------
 
-The Walrus is **free** and **open source**, released under the Apache License, Version 2.0.
+This package is distributed under the `MIT license`_.
+
+
+.. _Graphviz:  https://www.graphviz.org
+.. _DOT: https://www.graphviz.org/doc/info/lang.html
+.. _upstream repo: https://gitlab.com/graphviz/graphviz/
+.. _upstream-download: https://www.graphviz.org/download/
+.. _upstream-archived: https://www2.graphviz.org/Archive/stable/
+.. _upstream-windows: https://forum.graphviz.org/t/new-simplified-installation-procedure-on-windows/224
+
+.. _pip: https://pip.readthedocs.io
+
+.. _Jupyter notebooks: https://jupyter.org
+.. _IPython notebooks: https://ipython.org/notebook.html
+.. _Jupyter QtConsole: https://qtconsole.readthedocs.io
+
+.. _notebook: https://github.com/xflr6/graphviz/blob/master/examples/graphviz-notebook.ipynb
+.. _notebook-nbviewer: https://nbviewer.jupyter.org/github/xflr6/graphviz/blob/master/examples/graphviz-notebook.ipynb
+
+.. _Anaconda: https://docs.anaconda.com/anaconda/install/
+.. _conda-forge: https://conda-forge.org
+.. _conda-forge-python-graphviz: https://anaconda.org/conda-forge/python-graphviz
+.. _conda-forge-python-graphviz-feedstock: https://github.com/conda-forge/python-graphviz-feedstock
+.. _conda-forge-graphviz: https://anaconda.org/conda-forge/graphviz
+.. _conda-forge-graphviz-feedstock: https://github.com/conda-forge/graphviz-feedstock
+
+.. _pygraphviz: https://pypi.org/project/pygraphviz/
+.. _graphviz-python: https://pypi.org/project/graphviz-python/
+.. _graphviz-python-docs: https://www.graphviz.org/pdf/gv.3python.pdf
+.. _pydot: https://pypi.org/project/pydot/
+
+.. _MIT license: https://opensource.org/licenses/MIT
+
+
+.. |--| unicode:: U+2013
+
+
+.. |PyPI version| image:: https://img.shields.io/pypi/v/graphviz.svg
+    :target: https://pypi.org/project/graphviz/
+    :alt: Latest PyPI Version
+.. |License| image:: https://img.shields.io/pypi/l/graphviz.svg
+    :target: https://pypi.org/project/graphviz/
+    :alt: License
+.. |Supported Python| image:: https://img.shields.io/pypi/pyversions/graphviz.svg
+    :target: https://pypi.org/project/graphviz/
+    :alt: Supported Python Versions
+.. |Format| image:: https://img.shields.io/pypi/format/graphviz.svg
+    :target: https://pypi.org/project/graphviz/
+    :alt: Format
+
+.. |Build| image:: https://github.com/xflr6/graphviz/actions/workflows/build.yaml/badge.svg?branch=master
+    :target: https://github.com/xflr6/graphviz/actions/workflows/build.yaml?query=branch%3Amaster
+    :alt: Build
+.. |Codecov| image:: https://codecov.io/gh/xflr6/graphviz/branch/master/graph/badge.svg
+    :target: https://codecov.io/gh/xflr6/graphviz
+    :alt: Codecov
+.. |Readthedocs-stable| image:: https://readthedocs.org/projects/graphviz/badge/?version=stable
+    :target: https://graphviz.readthedocs.io/en/stable/?badge=stable
+    :alt: Readthedocs stable
+.. |Readthedocs-latest| image:: https://readthedocs.org/projects/graphviz/badge/?version=latest
+    :target: https://graphviz.readthedocs.io/en/latest/?badge=latest
+    :alt: Readthedocs latest
