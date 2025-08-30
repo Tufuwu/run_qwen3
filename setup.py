@@ -1,59 +1,39 @@
-# -*- coding: utf-8 -*-
-from setuptools import setup
-import os
-import re
+from setuptools import setup, find_packages, __version__
+from os import path
 
-# Lovingly adapted from https://github.com/kennethreitz/requests/blob/39d693548892057adad703fda630f925e61ee557/setup.py#L50-L55
-with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'pusher/version.py'), 'r') as fd:
-    VERSION = re.search(r'^VERSION = [\']([^\']*)[\']',
-                        fd.read(), re.MULTILINE).group(1)
+desc_file = "README.md"
 
-if not VERSION:
-    raise RuntimeError('Ensure `VERSION` is correctly set in ./pusher/version.py')
+with open(desc_file, "r") as fh:
+    long_description = fh.read()
+
+here = path.abspath(path.dirname(__file__))
+# get the dependencies and installs
+with open(path.join(here, "requirements.txt"), encoding="utf-8") as f:
+    all_reqs = f.read().split("\n")
+
+install_requires = [x.strip() for x in all_reqs if "git+" not in x]
 
 setup(
-    name='pusher',
-    version=VERSION,
-    description='A Python library to interract with the Pusher Channels API',
-    url='https://github.com/pusher/pusher-http-python',
-    author='Pusher',
-    author_email='support@pusher.com',
+    name="casbin_sqlalchemy_adapter",
+    author="TechLee",
+    author_email="techlee@qq.com",
+    description="SQLAlchemy Adapter for PyCasbin",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    url="https://github.com/pycasbin/sqlalchemy-adapter",
+    keywords=["casbin", "SQLAlchemy", "casbin-adapter", "rbac", "access control", "abac", "acl", "permission"],
+    packages=find_packages(),
+    install_requires=install_requires,
+    python_requires=">=3.3",
+    license="Apache 2.0",
     classifiers=[
-        'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python',
-        'Development Status :: 4 - Beta',
-        'Intended Audience :: Developers',
-        'Topic :: Internet :: WWW/HTTP',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 3',
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "License :: OSI Approved :: Apache Software License",
+        "Operating System :: OS Independent",
     ],
-    keywords='pusher rest realtime websockets service',
-    license='MIT',
-
-    packages=[
-        'pusher'
-    ],
-
-    install_requires=[
-        'six',
-        'requests>=2.3.0',
-        'urllib3',
-        'pyopenssl',
-        'ndg-httpsclient',
-        'pyasn1',
-        'pynacl'
-    ],
-
-    tests_require=['nose', 'mock', 'HTTPretty'],
-
-    extras_require={
-        'aiohttp': ['aiohttp>=0.20.0'],
-        'tornado': ['tornado>=5.0.0']
-    },
-
-    package_data={
-        'pusher': ['cacert.pem']
-    },
-
-    test_suite='pusher_tests',
+    data_files=[desc_file],
 )
