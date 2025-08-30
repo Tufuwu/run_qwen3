@@ -1,38 +1,27 @@
-name: Python application
-on: [push, pull_request]
+name: Python CI
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        include:
-          - python-version: 3.8
-            TOXENV: py310
-          - python-version: 3.9
-            TOXENV: py39
-          - python-version: 3.8
-            TOXENV: py38
-          - python-version: 3.8
-            TOXENV: py38
-          - python-version: 3.8
-            TOXENV: py38
+        python: [3.8, 3.8, 3.8, 3.8]
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python ${{ matrix.python }}
         uses: actions/setup-python@v2
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: ${{ matrix.python }}
       - name: Install dependencies
         run: |
-          pip install -U setuptools tox pip virtualenv
-          pip install -e .
-          pip install pytest-cov codecov -r tests/requirements.txt
-      - name: Run tox
-        run: |
-          export TOXENV=${{ matrix.TOXENV }}
-          tox
-      - name: Run tests and upload coverage
-        if: success()
-        run: |
-          py.test tests/ example/ --cov=./
-          codecov
+          pip install -U --force setuptools pip
+          python setup.py develop
+          pip install -e '.[tests]'
+      - name: Run linter
+        run: pylama
+      - name: Run tests
+        run: py.test
