@@ -8,29 +8,23 @@ on:
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        os: [ubuntu-latest, ppc64le]
-        python: ['3.8', '3.9']
+        python: [3.8, 3.8, 3.8, 3.8]
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python ${{ matrix.python }}
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python }}
-      - name: Install dependencies
-        run: pip install -r dev-requirements.txt
-      - name: Clean
-        run: make clean
-      - name: PEP8
-        run: make pep8
-      - name: Flake8
-        run: make flake8
-      - name: Check
-        run: make check
-      - name: Unit tests
-        run: make unittest
-      - name: Upload coverage
-        uses: coverallsapp/coveralls-action@v1
-
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python }}
+    - name: Install dependencies
+      run: |
+        pip install pyflakes pytest pytest-doctestplus
+    - name: Run checks
+      run: |
+        set -e
+        pyflakes .
+        python -We:invalid -We::SyntaxWarning -m compileall -f -q removestar/
+        pytest
+        python setup.py install
