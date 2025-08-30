@@ -1,5 +1,4 @@
-name: Test and Coverage
-
+name: Python CI
 on:
   push:
     branches: [ main ]
@@ -11,12 +10,30 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python: [3.8, 3.8, 3.8, 3.8]
+        include:
+          - python: 3.8
+            TOXENV: py38
+          - python: 3.8
+            TOXENV: py38
+          - python: 3.9
+            TOXENV: py39
+          - python: 3.10
+            TOXENV: py310
+          - python: 3.11
+            TOXENV: py311
+          - python: 3.11
+            TOXENV: pep8
+          - python: 3.11
+            TOXENV: docs
+          - python: 3.11
+            TOXENV: packaging
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python }}
-      - run: pip install -r requirements.txt -r test-requirements.txt
-      - run: py.test --cov tdclient tdclient/test
-      - run: coveralls
+      - name: Install tox
+        run: pip install tox
+      - name: Run tox
+        run: tox -e ${{ matrix.TOXENV }}
