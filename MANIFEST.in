@@ -1,2 +1,7 @@
+include README.rst
+include docs/*
 include LICENSE
-recursive-include tests *.py
+include examples/*
+include include/*
+include tests/*
+include octave/*
