@@ -1,8 +1,25 @@
-nose==1.3.7
-PyYAML==4.2b1
-coverage
-coveralls
-docopt==0.6.1
-requests==2.20.0
-oauthlib==0.7.2
-sh==1.08
+# Python 3 conversion
+future==0.18.2
+
+# Core
+Twisted==20.3.0
+
+# SSL connections
+pyOpenSSL<24.0.0
+service_identity==18.1.0
+enum34==1.1.9
+
+# Config parsing
+PyYAML==5.1.1
+
+# Wikipedia plugin
+beautifulsoup4==4.9.3
+
+# Weather & YouTube plugins
+requests==2.22.0
+
+# Google plugin
+google==2.0.3
+
+# Timezone plugin
+pytz==2020.4
