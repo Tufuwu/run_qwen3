@@ -1,28 +1,45 @@
-.. documentation master file, created by
-   sphinx-quickstart on Tue Jun 13 22:58:12 2017.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+.. _intro:
 
-.. include:: ../README.rst
+############
+Introduction
+############
 
-Contents
-========
+The Python Client for eAPI (pyeapi) is a native Python library wrapper around
+Arista EOS eAPI.  It provides a set of Python language bindings for configuring
+Arista EOS nodes.
+
+The Python library can be used to communicate with EOS either locally
+(on-box) or remotely (off-box). It uses a standard INI-style configuration file
+to specify one or more nodes and connection profiles.
+
+The pyeapi library also provides an API layer for building native Python
+objects to interact with the destination nodes. The API layer is a convenient
+implementation for working with the EOS configuration and is extensible for
+developing custom solutions.
+
+This library is freely provided to the open source community for building
+robust applications using Arista EOS. Support is provided as best effort
+through Github issues.
+
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
-   tutorial.rst
-   advanced.rst
-   recipes.rst
-   examples.rst
-   api.rst
+   install
+   quickstart
+   configfile
+   modules
+   requirements
+   examples
+   contribute
+   release-notes
+   support
+   license
 
-.. include:: ../HISTORY.rst
 
-
+******************
 Indices and tables
-==================
+******************
 
 * :ref:`genindex`
 * :ref:`modindex`
-* :ref:`search`
