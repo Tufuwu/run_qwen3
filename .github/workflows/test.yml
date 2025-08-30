@@ -1,30 +1,47 @@
-name: CI
+name: Python CI
+
 on:
   push:
-    branches:
-      - main
-
-services:
-  docker:
-    image: docker:stable
-    options: --privileged
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
-  Flake8:
+  build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        fast_finish: true
+        include:
+          - python-version: 3.8
+            env: cov
+            dist: xenial
+            runs-on: ubuntu:xenial
+          - python-version: 3.8
+            env: py38
+            dist: xenial
+            runs-on: ubuntu:xenial
+          - python-version: 3.8
+            env: py38
+            dist: bionic
+            runs-on: ubuntu:bionic
+          - python-version: 3.9
+            env: py39
+            dist: bionic
+            runs-on: ubuntu:bionic
+    env:
+      TOXENV: ${{ matrix.env }}
     steps:
       - uses: actions/checkout@v2
-      - name: Install flake8
-        run: pip install flake8
-      - name: Run flake8
-        run: flake8
-
-  Dockerfile-lint:
-    runs-on: ubuntu-latest
-    services:
-      - docker
-    steps:
-      - uses: actions/checkout@v2
-      - name: Run Dockerfile linter
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
         run: |
-          docker run -i hadolint/hadolint:v1.19.0-45-gef91156-alpine < Dockerfile
+          pip install -U tox coveralls
+      - name: Run tests
+        run: tox
+      - name: Upload coverage
+        if: matrix.env == 'cov'
+        run: coveralls

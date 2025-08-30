@@ -1,202 +1,73 @@
-# εxodus standalone
+# python-georss-ingv-centro-nazionale-terremoti-client
 
-[![Build Status](https://github.com/Exodus-Privacy/exodus-standalone/actions/workflows/main.yml/badge.svg?branch=master)](https://github.com/Exodus-Privacy/exodus-standalone/actions/workflows/main.yml)
+[![Build Status](https://github.com/exxamalte/python-georss-ingv-centro-nazionale-terremoti-client/workflows/CI/badge.svg?branch=master)](https://github.com/exxamalte/python-georss-ingv-centro-nazionale-terremoti-client/actions?workflow=CI)
+[![codecov](https://codecov.io/gh/exxamalte/python-georss-ingv-centro-nazionale-terremoti-client/branch/master/graph/badge.svg?token=PHASSFXFVU)](https://codecov.io/gh/exxamalte/python-georss-ingv-centro-nazionale-terremoti-client)
+[![PyPi](https://img.shields.io/pypi/v/georss-ingv-centro-nazionale-terremoti-client.svg)](https://pypi.python.org/pypi/georss-ingv-centro-nazionale-terremoti-client)
+[![Version](https://img.shields.io/pypi/pyversions/georss-ingv-centro-nazionale-terremoti-client.svg)](https://pypi.python.org/pypi/georss-ingv-centro-nazionale-terremoti-client)
 
-εxodus CLI client for local APK static analysis.
+This library provides convenient access to the [INGV Centro Nazionale Terremoti (Earthquakes) Feed](http://cnt.rm.ingv.it/).
 
-## Summary
+## Installation
+`pip install georss-ingv-centro-nazionale-terremoti-client`
 
-- [**Using Docker**](#using-docker)
-- [**Manual usage**](#manual-usage)
-  - [**Installation**](#installation)
-  - [**Analyze an APK file**](#analyze-an-apk-file)
-  - [**Download an APK from an εxodus instance**](#download-an-apk-from-an-εxodus-instance)
-- [**Continuous Integration**](#continuous-integration)
+## Usage
+See below for an example of how this library can be used. After instantiating 
+the feed class and supplying the required parameters, you can call `update` to 
+retrieve the feed data. The return value will be a tuple of a status code and 
+the actual data in the form of a list of specific feed entries.
 
-## Using Docker
+**Status Codes**
+* _UPDATE_OK_: Update went fine and data was retrieved. The library may still return empty data, for example because no entries fulfilled the filter criteria.
+* _UPDATE_OK_NO_DATA_: Update went fine but no data was retrieved, for example because the server indicated that there was not update since the last request.
+* _UPDATE_ERROR_: Something went wrong during the update
 
-The easiest way to analyze an APK is to use [our Docker image](https://hub.docker.com/r/exodusprivacy/exodus-standalone).
+**Supported Filters**
 
-Simply go to the directory where the APK file is and run:
+| Filter            |                            | Description |
+|-------------------|----------------------------|-------------|
+| Radius            | `filter_radius`            | Radius in kilometers around the home coordinates in which events from feed are included. |
+| Minimum Magnitude | `filter_minimum_magnitude` | Minimum magnitude as float value. Only events with a magnitude equal or above this value are included. |
 
-```bash
-docker run -v $(pwd)/<your apk file>:/app.apk --rm -i exodusprivacy/exodus-standalone
+**Example**
+```python
+from georss_ingv_centro_nazionale_terremoti_client import \
+    IngvCentroNazionaleTerremotiFeed
+# Home Coordinates: Latitude: 40.84, Longitude: 14.25
+# Filter radius: 200 km
+# Filter minimum magnitude: 4.0
+feed = IngvCentroNazionaleTerremotiFeed((40.84, 14.25), 
+                                        filter_radius=200, 
+                                        filter_minimum_magnitude=4.0)
+status, entries = feed.update()
 ```
 
-## Manual usage
+## Feed Manager
 
-### Installation
+The Feed Manager helps managing feed updates over time, by notifying the 
+consumer of the feed about new feed entries, updates and removed entries 
+compared to the last feed update.
 
-Clone this repository:
+* If the current feed update is the first one, then all feed entries will be 
+  reported as new. The feed manager will keep track of all feed entries' 
+  external IDs that it has successfully processed.
+* If the current feed update is not the first one, then the feed manager will 
+  produce three sets:
+  * Feed entries that were not in the previous feed update but are in the 
+    current feed update will be reported as new.
+  * Feed entries that were in the previous feed update and are still in the 
+    current feed update will be reported as to be updated.
+  * Feed entries that were in the previous feed update but are not in the 
+    current feed update will be reported to be removed.
+* If the current update fails, then all feed entries processed in the previous
+  feed update will be reported to be removed.
 
-```bash
-git clone https://github.com/Exodus-Privacy/exodus-standalone.git
-cd exodus-standalone
-```
+After a successful update from the feed, the feed manager will provide two
+different dates:
 
-Install `dexdump`:
-
-```bash
-sudo apt-get install dexdump
-```
-
-Create Python `virtualenv`:
-
-```bash
-sudo apt-get install virtualenv
-virtualenv venv -p python3
-source venv/bin/activate
-```
-
-Download and install dependencies:
-
-```bash
-pip install -r requirements.txt
-```
-
-### Analyze an APK file
-
-#### Usage
-
-```bash
-$ python exodus_analyze.py -h
-Usage: exodus_analyze.py [options] apk_file
-
-Options:
-  -h, --help            show this help message and exit
-  -t, --text            print textual report (default)
-  -j, --json            print JSON report
-  -o OUTPUT_FILE, --output=OUTPUT_FILE
-                        store JSON report in file (requires -j option)
-```
-
-#### Text output
-
-```bash
-python exodus_analyze.py my_apk.apk
-```
-
-be sure to activate the Python `virtualenv` before running `exodus_analyze.py`.
-
-*Example:*
-
-```bash
-=== Informations
-- APK path: /tmp/tmp1gzosyt4/com.semitan.tan.apk
-- APK sum: 8e85737be6911ea817b3b9f6a80290b85befe24ff5f57dc38996874dfde13ba7
-- App version: 5.7.0
-- App version code: 39
-- App name: Tan Network
-- App package: com.semitan.tan
-- App permissions: 9
-    - android.permission.INTERNET
-    - android.permission.ACCESS_NETWORK_STATE
-    - android.permission.ACCESS_FINE_LOCATION
-    - android.permission.WRITE_EXTERNAL_STORAGE
-    - android.permission.READ_PHONE_STATE
-    - android.permission.VIBRATE
-    - com.semitan.tan.permission.C2D_MESSAGE
-    - com.google.android.c2dm.permission.RECEIVE
-    - android.permission.WAKE_LOCK
-- App libraries: 0
-=== Found trackers
- - Google Analytics
- - Google Ads
- - Google DoubleClick
-```
-
-#### JSON output
-
-```bash
-python exodus_analyze.py -j [-o report.json] my_apk.apk
-```
-
-be sure to activate the Python `virtualenv` before running `exodus_analyze.py`.
-
-*Example:*
-
-```json
-{
-  "trackers": [
-    {
-      "id": 70,
-      "name": "Facebook Share"
-    },
-    [...]
-  ],
-  "apk": {
-    "path": "com.johnson.nett.apk",
-    "checksum": "70b6f0d9df432c66351a587df7b65bea160de59e791be420f0e68b2fc435429f"
-  },
-  "application": {
-    "version_code": "15",
-    "name": "Nett",
-    "permissions": [
-      "android.permission.INTERNET",
-      "android.permission.ACCESS_NETWORK_STATE",
-      "android.permission.WRITE_EXTERNAL_STORAGE",
-      "android.permission.READ_PHONE_STATE",
-      "android.permission.READ_EXTERNAL_STORAGE",
-      "android.permission.WAKE_LOCK",
-      "com.google.android.c2dm.permission.RECEIVE",
-      "com.johnson.nett.permission.C2D_MESSAGE"
-    ],
-    "version_name": "1.1.12",
-    "libraries": [],
-    "handle": "com.johnson.nett"
-  }
-}
-```
-
-#### Pitfalls
-
-This tool uses `dexdump` and only provides `GNU/Linux x86_64` version of it.
-
-### Download an APK from an εxodus instance
-
-Create `config.py` file in the project directory specifying:
-
-```bash
-CONFIG = {
-    'username': 'alice',
-    'password': 'bob',
-    'host': 'http://localhost:8000'
-}
-```
-
-Run
-
-```bash
-python exodus_download.py 15 /tmp/
-```
-
-be sure to activate the Python `virtualenv` before running `exodus_download.py`.
-
-#### Example of output
-
-```bash
-python exodus_download.py 15 /tmp/
-Successfully logged in
-Downloading the APK ...
-APK successfully downloaded: /tmp/fr.meteo.apk
-```
-
-## Continuous Integration
-
-You can use εxodus-standalone in your CI pipelines.
-
-Below are listed some examples of how to integrate it.
-
-:warning: Please note that the task will fail if it finds **any tracker**.
-
-### GitLab CI/CD
-
-```yml
-exodus_scan:
-  stage: audit
-  image:
-    name: exodusprivacy/exodus-standalone:latest
-    entrypoint: [""]
-  script:
-    - python /exodus_analyze.py [YOUR_APK_PATH]
-```
+* `last_update` will be the timestamp of the last successful update from the
+  feed. This date may be useful if the consumer of this library wants to
+  treat intermittent errors from feed updates differently.
+* `last_timestamp` will be the latest timestamp extracted from the feed data. 
+  This requires that the underlying feed data actually contains a suitable 
+  date. This date may be useful if the consumer of this library wants to 
+  process feed entries differently if they haven't actually been updated.
