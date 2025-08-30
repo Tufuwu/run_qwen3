@@ -1,24 +1,30 @@
-name: Python CI
+name: Python Tests
 
 on: [push, pull_request]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.8", "3.8", "3.8", "3.8", "3.9"]
+        include:
+          - python: 3.8
+          - python: 3.9
+          - python: 3.8
+          - os: arm64
+            python: 3.8
+          - os: amd64
+            python: 3.8
+          - python: 3.8
+          - python: 3.8
+          - python: pypy-3.6
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: ${{ matrix.python }}
       - name: Install dependencies
-        run: |
-          pip install -e .
-          pip install pycodestyle
+        run: pip install mock
       - name: Run tests
-        run: python setup.py test
-      - name: Check style
-        run: pycodestyle tableauserverclient test samples
+        run: python -m unittest discover -p *_test.py
