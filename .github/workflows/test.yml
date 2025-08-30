@@ -1,55 +1,44 @@
 name: CI
-on:
-  push:
-    branches: [ main ]
+on: [push]
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        include:
-          - python: 3.8
-            env: TOXENV=py38
-          - python: 3.8
-            env: TOXENV=py38
-          - python: 3.8
-            env: TOXENV=py38
-          - python: 3.8
-            env: TOXENV=py38
-          - python: 3.8
-            env: TOXENV=py38
-          - python: 3.8
-            env: TOXENV=py38
-          - python: pypy-3.6
-            env: TOXENV=pypy-3.6
-          - python: 3.8
-            env: TOXENV=py38-cover,py38-cover,coverage
-          - python: 3.8
-            env: TOXENV=docs
-          - python: 3.8
-            env: TOXENV=py38-pyramid14
-          - python: 3.8
-            env: TOXENV=py38-pyramid19
+        python-version: [3.8, 3.8, 3.8, 3.8, 3.8, 3.8]
     steps:
-      - uses: actions/checkout@v2
-      - name: Install dependencies
-        run: |
-          pip install -U setuptools
-          pip install -U pip
-          pip install -U tox
-      - name: Run tests
-        run: tox
-      - name: Cache pip
-        uses: actions/cache@v2
-        with:
-          path: $HOME/.cache/pip
-          key: ${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ hashFiles('**/requirements.txt') }}
-      - name: Notifications
-        run: |
-          echo "Notifying via email and IRC..."
-          # Email notification
-          # Replace with actual email sending command
-          # IRC notification
-          # Replace with actual IRC bot command
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Update and install dependencies
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install -y graphviz python-tk python-matplotlib
+    - name: Install Python dependencies
+      run: |
+        pip install Sphinx
+        pip install recommonmark
+        pip install pep8
+        pip install coverage
+        pip install coveralls
+        pip install numpy
+    - name: Run setup commands
+      run: |
+        python -Wall setup.py try
+        python setup.py install
+        python -Wall setup.py test
+    - name: Run tests with coverage
+      env:
+        COVERAGE: 1
+      run: coverage run test/runtest.py
+    - name: Run doctest and html
+      run: |
+        python run.py --doctest
+        python run.py --html
+    - name: Lint with pep8
+      run: |
+        pep8 --exclude=asizeof.py,metadata.py,bottle*.py --max-line-length=80 pympler
+    - name: Upload coverage to coveralls
+      if: ${{ success }}
+      run: coveralls
