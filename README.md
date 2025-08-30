@@ -1,63 +1,40 @@
-Stregsystemet [![Django CI Actions Status](https://github.com/f-klubben/stregsystemet/workflows/Django%20CI/badge.svg)](https://github.com/f-klubben/stregsystemet/actions)  [![codecov](https://codecov.io/gh/f-klubben/stregsystemet/branch/next/graph/badge.svg)](https://codecov.io/gh/f-klubben/stregsystemet) 
-========
+[![GitHub Actions](https://github.com/flask-extensions/flask_simplelogin/workflows/Tests/badge.svg)](https://github.com/flask-extensions/flask_simplelogin/actions/workflows/tests.yml)
+[![PyPI](https://img.shields.io/pypi/v/flask_simplelogin.svg?style=flat-square)](https://pypi.org/project/flask_simplelogin/)
+[![PyPI versions](https://img.shields.io/pypi/pyversions/flask_simplelogin.svg?style=flat-square)](https://pypi.org/project/flask_simplelogin/)
+[![PyPI formats](https://img.shields.io/pypi/format/flask_simplelogin.svg?style=flat-square)](https://pypi.org/project/flask_simplelogin/)
+[![Flask](https://img.shields.io/badge/Flask-Extension-blue.svg?style=flat-square)](https://github.com/pallets/flask)
+[![Documentation](https://readthedocs.org/projects/flask-simple-login/badge/?version=latest)](https://flask-simple-login.readthedocs.io/en/latest/?badge=latest)
 
-This is the current stregsystem in the F-Klub.
+# Login Extension for Flask
 
-Branches
--------
- - `master`: The running code on the live system.
- - `next`: The set of changes which will be included in the next release.
+The simplest way to add login to flask!
 
-Python Environment
--------
-For windows using Anaconda and virtual environments:
-1. Download and install Anaconda
-2. In a shell:
-  - `conda create -n stregsystem python=3.6`
-  - `activate stregsystem`
-  - `pip install -r requirements.txt`
-3. ???
-4. Profit
+## Top Contributors
 
-For Ubuntu with virtual envs:
-1. Install python3 with pip
- - `sudo apt install python3 python3-pip`
-2. Create virtual environment
- - `python3 -m venv venv`
-3. Activate virtualenv
- - `source venv/bin/activate`
-4. Install packages
- - `pip3 install -r requirements.txt`
-5. ???
-6. Profit
+[![](https://sourcerer.io/fame/cuducos/cuducos/flask_simplelogin/images/0)](https://sourcerer.io/fame/cuducos/cuducos/flask_simplelogin/links/0)[![](https://sourcerer.io/fame/cuducos/cuducos/flask_simplelogin/images/1)](https://sourcerer.io/fame/cuducos/cuducos/flask_simplelogin/links/1)[![](https://sourcerer.io/fame/cuducos/cuducos/flask_simplelogin/images/2)](https://sourcerer.io/fame/cuducos/cuducos/flask_simplelogin/links/2)[![](https://sourcerer.io/fame/cuducos/cuducos/flask_simplelogin/images/3)](https://sourcerer.io/fame/cuducos/cuducos/flask_simplelogin/links/3)[![](https://sourcerer.io/fame/cuducos/cuducos/flask_simplelogin/images/4)](https://sourcerer.io/fame/cuducos/cuducos/flask_simplelogin/links/4)[![](https://sourcerer.io/fame/cuducos/cuducos/flask_simplelogin/images/5)](https://sourcerer.io/fame/cuducos/cuducos/flask_simplelogin/links/5)[![](https://sourcerer.io/fame/cuducos/cuducos/flask_simplelogin/images/6)](https://sourcerer.io/fame/cuducos/cuducos/flask_simplelogin/links/6)[![](https://sourcerer.io/fame/cuducos/cuducos/flask_simplelogin/images/7)](https://sourcerer.io/fame/cuducos/cuducos/flask_simplelogin/links/7)
 
-Using Testdata
---------
-In order to simplify development for all, we have included a test fixture.
-Using `testserver` will delete the data after running.
-To use it do the following:
-1. `python manage.py migrate`
-2. `python manage.py testserver stregsystem/fixtures/testdata.json`
-3. ???
-4. Profit
+Add yourself, send a PR!
 
-Admin panel: <http://127.0.0.1:8000/admin/>  
-Login: `tester:treotreo`
+## How it works
 
-Stregsystem: <http://127.0.0.1:8000/1/>  
-User: `tester`
+First install it from [PyPI](https://pypi.org/project/flask_simplelogin/).
 
-Persistent Testdata
--------
-Using `runserver` will automatically reload django on code change, and persist data in the database configured in `local.cfg` (can be whatever backend you want to use).
-First time:
-1. `python manage.py migrate`
-2. `python manage.py loaddata stregsystem/fixtures/testdata.json`
-3. `python manage.py runserver`
-4. ???
-5. Profit
+> `pip install flask_simplelogin`
 
-From then on
-1. `python manage.py runserver`
-2. ???
-3. Profit
+```python
+from flask import Flask
+from flask_simplelogin import SimpleLogin
+
+app = Flask(__name__)
+SimpleLogin(app)
+```
+
+## **That's it!**
+
+Now you have `/login` and `/logout` routes in your application.
+
+The username defaults to `admin` and the password defaults to `secret` (yeah that's not clever, let's see how to change it)
+
+![Login Screen](/login_screen.png)
+
+Check the [documentation](https://flask-simple-login.readthedocs.io/en/latest/?badge=latest) for more details!
