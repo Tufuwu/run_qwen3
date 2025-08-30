@@ -1,34 +1,32 @@
 name: Python package
-
 on:
   push:
     tags: true
-
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.8, 3.8, 3.8, '3.8']
+        python-version: ["3.8", "3.8", "3.8", "3.8", "3.8"]
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up Python
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
-          apt-get install -qq openjdk-8-jre
-      - name: Install package
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install twine
+      - name: Build package
         run: |
-          python setup.py install
-      - name: Run tests
+          python setup.py bdist
+          python setup.py build
+      - name: Upload to PyPI
         run: |
-          python setup.py test
-      - name: Deploy to PyPI
-        uses: pypa/upload-to-pypi@v1
-        with:
-          username: moxfyre
-          password: ${{ secrets.PYPI_PASSWORD }}
-          repository: pypi
-          files: dist/*
+          twine upload dist/*
+        env:
+          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
