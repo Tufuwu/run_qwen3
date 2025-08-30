@@ -1,41 +1,33 @@
-name: Python Tests
-on:
-  push:
-    branches:
-      - main
+name: Python CI
+
+on: [push, pull_request]
+
 jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        include:
-          - python-version: 3.8
-          - python-version: 3.8
-          - python-version: 3.8
-          - python-version: 3.9
-          - python-version: 3.9
-            env: TOXENV=mypy
+        python: ["3.8", "3.8", "3.8", "3.8", "3.8", "3.9", "pypy", "pypy-3.6"]
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: ${{ matrix.python-version }}
-    - name: Cache pip
+        python-version: ${{ matrix.python }}
+    - name: Cache hypothesis
       uses: actions/cache@v2
       with:
-        path: ~/.cache/pip
-        key: pip-${{ matrix.python-version }}
+        path: $HOME/.hypothesis
+        key: ${{ matrix.python }}-hypothesis
     - name: Install dependencies
       run: |
-        pip install tox-travis codecov
+        python -m pip install --upgrade pip
+        pip install --upgrade --upgrade-strategy only-if-needed pytest pytest-catchlog
+        pip install .
     - name: Run tests
+      run: py.test
+    - name: Set environment variables
       run: |
-        tox -v
-    - name: Upload coverage
-      run: |
-        codecov
-    - name: IRC Notification
-      if: failure()
-      run: |
-        curl -s -X POST -H "Content-Type: application/json" --data '{"text":"Build failed: ${{ github.event.head_commit.message }}"}' ${{ secrets.IRC_CHANNEL }}
+        export HYPOTHESIS_STORAGE_DIRECTORY=$HOME/.hypothesis
+        echo "HYPOTHESIS_STORAGE_DIRECTORY=$HOME/.hypothesis" >> $GITHUB_ENV
+
