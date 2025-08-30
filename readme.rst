@@ -1,184 +1,169 @@
-=============
-Feedgenerator
-=============
+.. image:: https://github.com/MahjongRepository/mahjong/workflows/Mahjong%20lib/badge.svg
+    :target: https://github.com/MahjongRepository/mahjong
 
-This module can be used to generate web feeds in both ATOM and RSS format. It
-has support for extensions. Included is for example an extension to produce
-Podcasts.
+Python 2.7 and 3.5+ are supported.
 
-It is licensed under the terms of both, the FreeBSD license and the LGPLv3+.
-Choose the one which is more convenient for you. For more details have a look
-at license.bsd and license.lgpl.
-
-More details about the project:
-
-- `Repository <https://github.com/lkiesow/python-feedgen>`_
-- `Documentation <https://lkiesow.github.io/python-feedgen/>`_
-- `Python Package Index <https://pypi.python.org/pypi/feedgen/>`_
+We support the Japanese version of mahjong only (riichi mahjong).
 
 
-------------
-Installation
-------------
+Riichi mahjong hands calculation
+================================
 
-**Prebuild packages**
+This library can calculate hand cost (han, fu with details, yaku, and scores) for riichi mahjong (Japanese version).
 
-If your distribution includes this project as package, like Fedora Linux does,
-you can simply use your package manager to install the package. For example::
+It supports optional features like:
 
-    $ dnf install python3-feedgen
-
-
-**Using pip**
-
-You can also use pip to install the feedgen module. Simply run::
-
-    $ pip install feedgen
-
-
--------------
-Create a Feed
--------------
-
-To create a feed simply instantiate the FeedGenerator class and insert some
-data:
-
-.. code-block:: python
-
-    from feedgen.feed import FeedGenerator
-    fg = FeedGenerator()
-    fg.id('http://lernfunk.de/media/654321')
-    fg.title('Some Testfeed')
-    fg.author( {'name':'John Doe','email':'john@example.de'} )
-    fg.link( href='http://example.com', rel='alternate' )
-    fg.logo('http://ex.com/logo.jpg')
-    fg.subtitle('This is a cool feed!')
-    fg.link( href='http://larskiesow.de/test.atom', rel='self' )
-    fg.language('en')
-
-Note that for the methods which set fields that can occur more than once in a
-feed you can use all of the following ways to provide data:
-
-- Provide the data for that element as keyword arguments
-- Provide the data for that element as dictionary
-- Provide a list of dictionaries with the data for several elements
-
-Example:
-
-.. code-block:: python
-
-    fg.contributor( name='John Doe', email='jdoe@example.com' )
-    fg.contributor({'name':'John Doe', 'email':'jdoe@example.com'})
-    fg.contributor([{'name':'John Doe', 'email':'jdoe@example.com'}, ...])
-
------------------
-Generate the Feed
------------------
-
-After that you can generate both RSS or ATOM by calling the respective method:
-
-.. code-block:: python
-
-    atomfeed = fg.atom_str(pretty=True) # Get the ATOM feed as string
-    rssfeed  = fg.rss_str(pretty=True) # Get the RSS feed as string
-    fg.atom_file('atom.xml') # Write the ATOM feed to a file
-    fg.rss_file('rss.xml') # Write the RSS feed to a file
+==========================================================================================  ========================= ===========================
+Feature                                                                                     Keyword parameter         Default value
+==========================================================================================  ========================= ===========================
+Disable or enable open tanyao yaku                                                          has_open_tanyao           False
+------------------------------------------------------------------------------------------  ------------------------- ---------------------------
+Disable or enable aka dora in the hand                                                      has_aka_dora              False
+------------------------------------------------------------------------------------------  ------------------------- ---------------------------
+Disable or enable double yakuman (like suuanko tanki)                                       has_double_yakuman        True
+------------------------------------------------------------------------------------------  ------------------------- ---------------------------
+Settings for different kazoe yakuman calculation (it сan be an yakuman or a sanbaiman)      kazoe_limit               HandConstants.KAZOE_LIMITED
+------------------------------------------------------------------------------------------  ------------------------- ---------------------------
+Support kiriage mangan                                                                      kiriage                   False
+------------------------------------------------------------------------------------------  ------------------------- ---------------------------
+Allow to disable additional +2 fu in open hand (you can make 1-20 hand with that setting)   fu_for_open_pinfu         True
+------------------------------------------------------------------------------------------  ------------------------- ---------------------------
+Disable or enable pinfu tsumo                                                               fu_for_pinfu_tsumo        False
+------------------------------------------------------------------------------------------  ------------------------- ---------------------------
+Counting renhou as 5 han or yakuman                                                         renhou_as_yakuman         False
+------------------------------------------------------------------------------------------  ------------------------- ---------------------------
+Disable or enable Daisharin yakuman                                                         has_daisharin             False
+------------------------------------------------------------------------------------------  ------------------------- ---------------------------
+Disable or enable Daisharin in other suits (Daisuurin, Daichikurin)                         has_daisharin_other_suits False
+==========================================================================================  ========================= ===========================
 
 
-----------------
-Add Feed Entries
-----------------
+The code was validated on tenhou.net phoenix replays in total on **11,120,125 hands**.
 
-To add entries (items) to a feed you need to create new FeedEntry objects and
-append them to the list of entries in the FeedGenerator. The most convenient
-way to go is to use the FeedGenerator itself for the instantiation of the
-FeedEntry object:
+So, we can say that our hand calculator works the same way that tenhou.net hand calculation.
 
-.. code-block:: python
+Project repository: https://github.com/MahjongRepository/mahjong
 
-    fe = fg.add_entry()
-    fe.id('http://lernfunk.de/media/654321/1')
-    fe.title('The First Episode')
-    fe.link(href="http://lernfunk.de/feed")
 
-The FeedGenerator's method `add_entry(...)` will generate a new FeedEntry
-object, automatically append it to the feeds internal list of entries and
-return it, so that additional data can be added.
+How to install
+--------------
 
-----------
-Extensions
+::
+
+   pip install mahjong
+
+
+How to use
 ----------
 
-The FeedGenerator supports extensions to include additional data into the XML
-structure of the feeds. Extensions can be loaded like this:
+You can find more examples here: https://github.com/MahjongRepository/mahjong/blob/master/doc/examples.py
+
+Let's calculate how much will cost this hand:
+
+.. image:: https://user-images.githubusercontent.com/475367/30796350-3d30431a-a204-11e7-99e5-aab144c82f97.png
+
+
+Tanyao hand by ron
+^^^^^^^^^^^^^^^^^^
 
 .. code-block:: python
 
-    fg.load_extension('someext', atom=True, rss=True)
+    from mahjong.hand_calculating.hand import HandCalculator
+    from mahjong.tile import TilesConverter
+    from mahjong.hand_calculating.hand_config import HandConfig
+    from mahjong.meld import Meld
 
-This example would try to load the extension “someext” from the file
-`ext/someext.py`.  It is required that `someext.py` contains a class named
-“SomextExtension” which is required to have at least the two methods
-`extend_rss(...)` and `extend_atom(...)`. Although not required, it is strongly
-suggested to use `BaseExtension` from `ext/base.py` as superclass.
+    calculator = HandCalculator()
 
-`load_extension('someext', ...)` will also try to load a class named
-“SomextEntryExtension” for every entry of the feed. This class can be located
-either in the same file as SomextExtension or in `ext/someext_entry.py` which
-is suggested especially for large extensions.
+    # we had to use all 14 tiles in that array
+    tiles = TilesConverter.string_to_136_array(man='22444', pin='333567', sou='444')
+    win_tile = TilesConverter.string_to_136_array(sou='4')[0]
 
-The parameters `atom` and `rss` control if the extension is used for ATOM and
-RSS feeds respectively. The default value for both parameters is `True`,
-meaning the extension is used for both kinds of feeds.
+    result = calculator.estimate_hand_value(tiles, win_tile)
 
-**Example: Producing a Podcast**
+    print(result.han, result.fu)
+    print(result.cost['main'])
+    print(result.yaku)
+    for fu_item in result.fu_details:
+        print(fu_item)
 
-One extension already provided is the podcast extension. A podcast is an RSS
-feed with some additional elements for ITunes.
+Output:
 
-To produce a podcast simply load the `podcast` extension:
+::
+
+    1 40
+    1300
+    [Tanyao]
+    {'fu': 30, 'reason': 'base'}
+    {'fu': 4, 'reason': 'closed_pon'}
+    {'fu': 4, 'reason': 'closed_pon'}
+    {'fu': 2, 'reason': 'open_pon'}
+
+
+How about tsumo?
+^^^^^^^^^^^^^^^^
 
 .. code-block:: python
 
-    from feedgen.feed import FeedGenerator
-    fg = FeedGenerator()
-    fg.load_extension('podcast')
-    ...
-    fg.podcast.itunes_category('Technology', 'Podcasting')
-    ...
-    fe = fg.add_entry()
-    fe.id('http://lernfunk.de/media/654321/1/file.mp3')
-    fe.title('The First Episode')
-    fe.description('Enjoy our first episode.')
-    fe.enclosure('http://lernfunk.de/media/654321/1/file.mp3', 0, 'audio/mpeg')
-    ...
-    fg.rss_str(pretty=True)
-    fg.rss_file('podcast.xml')
+    result = calculator.estimate_hand_value(tiles, win_tile, config=HandConfig(is_tsumo=True))
 
-If the FeedGenerator class is used to load an extension, it is automatically
-loaded for every feed entry as well.  You can, however, load an extension for a
-specific FeedEntry only by calling `load_extension(...)` on that entry.
+    print(result.han, result.fu)
+    print(result.cost['main'], result.cost['additional'])
+    print(result.yaku)
+    for fu_item in result.fu_details:
+        print(fu_item)
 
-Even if extensions are loaded, they can be temporarily disabled during the feed
-generation by calling the generating method with the keyword argument
-`extensions` set to `False`.
+Output:
 
-**Custom Extensions**
+::
 
-If you want to load custom extensions which are not part of the feedgen
-package, you can use the method `register_extension` instead. You can directly
-pass the classes for the feed and the entry extension to this method meaning
-that you can define them everywhere.
+    4 40
+    4000 2000
+    [Menzen Tsumo, Tanyao, San Ankou]
+    {'fu': 20, 'reason': 'base'}
+    {'fu': 4, 'reason': 'closed_pon'}
+    {'fu': 4, 'reason': 'closed_pon'}
+    {'fu': 4, 'reason': 'closed_pon'}
+    {'fu': 2, 'reason': 'tsumo'}
 
 
----------------------
-Testing the Generator
----------------------
+What if we add open set?
+^^^^^^^^^^^^^^^^^^^^^^^^
 
-You can test the module by simply executing::
+.. code-block:: python
 
-    $ python -m feedgen
+    melds = [Meld(meld_type=Meld.PON, tiles=TilesConverter.string_to_136_array(man='444'))]
 
-If you want to have a look at the code for this test to have a working code
-example for a whole feed generation process, you can find it in the
-`__main__.py <https://github.com/lkiesow/python-feedgen/blob/master/feedgen/__main__.py>`_.
+    result = calculator.estimate_hand_value(tiles, win_tile, melds=melds, config=HandConfig(options=OptionalRules(has_open_tanyao=True)))
+
+    print(result.han, result.fu)
+    print(result.cost['main'])
+    print(result.yaku)
+    for fu_item in result.fu_details:
+        print(fu_item)
+
+Output:
+
+::
+
+    1 30
+    1000
+    [Tanyao]
+    {'fu': 20, 'reason': 'base'}
+    {'fu': 4, 'reason': 'closed_pon'}
+    {'fu': 2, 'reason': 'open_pon'}
+    {'fu': 2, 'reason': 'open_pon'}
+
+
+Shanten calculation
+===================
+
+.. code-block:: python
+
+    from mahjong.shanten import Shanten
+
+    shanten = Shanten()
+    tiles = TilesConverter.string_to_34_array(man='13569', pin='123459', sou='443')
+    result = shanten.calculate_shanten(tiles)
+
+    print(result)

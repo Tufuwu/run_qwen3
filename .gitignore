@@ -1,17 +1,16 @@
-.idea/
-venv
-*.pyc
-*.pyo
-*.swp
+.idea
+env
+env38
 
-feedgen/tests/tmp_Atomfeed.xml
+*.py[cod]
+__pycache__
+.DS_Store
 
-feedgen/tests/tmp_Rssfeed.xml
+MANIFEST
+dist/*
+mahjong.egg-info
+build/*
 
-tmp_Atomfeed.xml
 
-tmp_Rssfeed.xml
-
-# testing artifacts
-.coverage
-*.egg-info/
+temp
+temp.py
