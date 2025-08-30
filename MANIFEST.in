@@ -1,1 +1,8 @@
-recursive-include feedcrawler/web *
+include .version
+include LICENSE.txt
+include MANIFEST.in
+include README.rst
+include doc/examples/*.py
+include tests/conftest.py
+include tests/pytest.ini
+include tests/test_*.py
