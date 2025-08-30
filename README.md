@@ -1,229 +1,293 @@
-[![Build Status](https://github.com/laowantong/paroxython/actions/workflows/build.yml/badge.svg)](https://github.com/laowantong/paroxython/actions/workflows/build.yml)
-[![codecov](https://img.shields.io/codecov/c/github/laowantong/paroxython/master)](https://codecov.io/gh/laowantong/paroxython)
-[![Checked with mypy](https://img.shields.io/badge/typing-mypy-brightgreen)](http://mypy-lang.org/)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/73432ed4c5294326ba6279bbbb0fe2e6)](https://www.codacy.com/manual/laowantong/paroxython)
-[![Updates](https://pyup.io/repos/github/laowantong/paroxython/shield.svg)](https://pyup.io/repos/github/laowantong/paroxython/)
-![PyPI - Python Version](https://img.shields.io/pypi/pyversions/paroxython)
-[![GitHub Release](https://img.shields.io/github/release/laowantong/paroxython.svg?style=flat)]()
-![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/laowantong/paroxython)
-[![paroxython SLOC](https://img.shields.io/badge/main%20program-~1850%20SLOC-blue)](https://github.com/laowantong/paroxython/blob/master/paroxython)
-[![tests SLOC](https://img.shields.io/badge/tests-~2550%20SLOC-blue)](https://github.com/laowantong/paroxython/blob/master/tests)
-[![helpers SLOC](https://img.shields.io/badge/helpers-~900%20SLOC-blue)](https://github.com/laowantong/paroxython/blob/master/helpers)
-[![spec features](https://img.shields.io/badge/spec-173%20features-blue)](https://github.com/laowantong/paroxython/blob/master/paroxython/resources/spec.md)
-[![taxonomy mappings](https://img.shields.io/badge/taxonomy-282%20mappings-blue)](https://github.com/laowantong/paroxython/blob/master/paroxython/resources/taxonomy.tsv)
-![GitHub commit activity](https://img.shields.io/github/commit-activity/y/laowantong/paroxython.svg?style=flat)
-[![Downloads](https://pepy.tech/badge/paroxython/week)](https://pepy.tech/project/paroxython/week)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Band-aid](https://badgen.net/badge/not%C2%A0%C2%A0%F0%9F%85%B3%F0%9F%85%B4%F0%9F%85%B0%F0%9F%85%B3/yet/F3D9C5?labelColor=F3D9C5)](https://youtu.be/QcbR1J_4ICg?t=54)
+# django-uniauth
+
+[![build][build-image]][build-url]
+[![pyver][pyver-image]][pyver-url]
+[![djangover][djangover-image]][djangover-url]
+[![pypi][pypi-image]][pypi-url]
+
+`django-uniauth` is an app for allowing authentication through services commonly used by universities, such as [CAS](https://www.apereo.org/projects/cas), while also permitting custom authentication schemes. This approach allows developers to leverage the user data contained within university databases, without strictly tethering themselves to those services. It also allows educational software to have a drop-in authentication solution utilizing the single-sign-on mechanisms of universities, typically CAS, to avoid requiring students to create an additional username or password.
+
+The app was designed to replace key features of the built-in `django.contrib.auth` package. Developers may simply replace the appropriate backends and URLs and let Uniauth handle authentication entirely if they wish. However, the app is also fully customizable, and components may be swapped with compatible replacements if desired.
 
 <p align="center">
-  <a href="https://laowantong.github.io/paroxython/index.html">
-  <img src="docs/resources/logo.png">
-  </a>
+  <img src="https://s3.amazonaws.com/uniauth/documentation/Login+Page.png" />
 </p>
 
-## Introduction
+## Features
 
-Paroxython is a set of command line tools which **tag** and **filter** by algorithmic features your collection of Python programming exercises.
+ - Supports Python 2.7, 3.5+
+ - Supports Django 1.11, 2.x, 3.x, 4.x
+ - Supports using a [custom User model](https://docs.djangoproject.com/en/2.2/topics/auth/customizing/#specifying-a-custom-user-model)
+ - Supports using email addresses as the ["username" field](https://docs.djangoproject.com/en/2.2/topics/auth/customizing/#django.contrib.auth.models.CustomUser.USERNAME_FIELD)
+ - Users can link multiple email addresses and use any for authentication
+ - Supports CAS authentication and Single Sign On
+ - Multiple CAS servers can be configured and users may use any for authentication
 
-### Audience
+## Major Updates
 
-You are a teacher, in charge of an introductory programming course in an educational institution. Over the years, you have accumulated many—far too many—programs and code snippets that may be of interest to your students.
+ - **1.4.0:** Added support for custom JWT token serializers
+ - **1.3.1:** Added support for Django 4.x and newer Python versions
+ - **1.3.0:** Added [JWT Support](https://github.com/lgoodridge/django-uniauth#using-jwt-authentication)
+ - **1.2.0:** Uniauth `UserProfile` model now backreferenced from the Django `User` model via `user.uniauth_profile` instead of `user.profile`.
 
-Or, as a seasoned developer, you would like to share your knowledge by helping a loved one learn how to code. A cursory search for pedagogical material yields an overwhelming amount of websites and repositories stuffed with Python programs of various levels (e.g.,
-[1](https://github.com/TheAlgorithms/Python),
-[2](http://rosettacode.org/wiki/Category:Python),
-[3](https://www.programming-idioms.org/about#about-block-language-coverage),
-[4](https://github.com/codebasics/py),
-[5](https://github.com/keon/algorithms),
-[6](https://github.com/OmkarPathak/Python-Programs),
-and a lot more from [Awesome Python in Education](https://github.com/quobit/awesome-python-in-education)).
+## Tutorials
 
-In any case, the Python source codes you have gathered are typically
-**numerous** (hundreds or even thousands),
-**reasonably sized** (anything below 100 lines of code),
-and **educational** in nature (e.g., snippets, examples, quizzes, exercise solutions, classic algorithms).
-The programming concepts you plan to teach remain relatively **low level** (e.g. assignments, nested loops, accumulation patterns, tail recursive functions, etc.).
+ - How to add CAS authentication with Uniauth: [link](https://medium.com/@ldgoodridge95/adding-cas-authentication-to-your-django-app-with-django-uniauth-13ff4e1e7bfa)
 
-If all that sounds familiar, keep reading me.
+## Table of Contents
 
-### Main goals
+ - [Installation](https://github.com/lgoodridge/django-uniauth#installation)
+ - [Email Setup](https://github.com/lgoodridge/django-uniauth#email-setup)
+ - [Settings](https://github.com/lgoodridge/django-uniauth#settings)
+ - [Users in Uniauth](https://github.com/lgoodridge/django-uniauth#users-in-uniauth)
+ - [Models](https://github.com/lgoodridge/django-uniauth#models)
+ - [Backends](https://github.com/lgoodridge/django-uniauth#backends)
+ - [Commands](https://github.com/lgoodridge/django-uniauth#commands)
+ - [Views](https://github.com/lgoodridge/django-uniauth#views)
+ - [Template Customization](https://github.com/lgoodridge/django-uniauth#template-customization)
+ - [URLs](https://github.com/lgoodridge/django-uniauth#urls)
+ - [User Migration](https://github.com/lgoodridge/django-uniauth#user-migration)
+ - [Using JWT Authentication](https://github.com/lgoodridge/django-uniauth#using-jwt-authentication)
+ - [Demo Application](https://github.com/lgoodridge/django-uniauth#demo-application)
+ - [Acknowledgements](https://github.com/lgoodridge/django-uniauth#acknowledgements)
 
-Paroxython aims to help you select, from your collection, the one program that best suits your needs. For instance, it will gladly answer the following questions:
+## Installation
 
-> - How can this concept be illustrated?
-> - What problems use the same algorithmic and data structures as this one?
-> - What homework assignment should I give my students so they can practice the content of the last lesson?
+Install using [pip](http://www.pip-installer.org/):
 
-Moreover, since Paroxython knows what your class knows, it can recommend the right program at the right time:
+    pip install django-uniauth
 
-> - What would make a good review exercise?
-> - Which exercises can I give on this exam?
-> - What is the current learning cost of this example?
+Add 'uniauth' to your `INSTALLED_APPS` setting:
 
-In the long run, Paroxython may guide you and somehow make you rethink your course outline:
+    INSTALLED_APPS = [
+        ...
+        uniauth,
+    ]
 
-> - What are the prerequisites for the concept of assignment?
-> - Do I have enough material to introduce subroutines before I even talk about conditionals and loops?
-> - Among the loops, which must come first: the most powerful (`while`), or the most useful (`for`)?
-> - How to logically structure this bunch of usual iterative patterns?
-> - What are the _basics_, exactly?
+Add the desired Uniauth authentication backends. For example:
 
-All issues on which the author changed his mind since he started to work on this project!
+    AUTHENTICATION_BACKENDS = [
+        'uniauth.backends.LinkedEmailBackend',
+        'uniauth.backends.CASBackend',
+    ]
 
-In an ideal world, Paroxython could even put an end to the deadliest religious wars, with rational, data-driven arguments:
+Include the `uniauth` URLS in your `urls.py`:
 
-> - Father, is it a sin to exit early?
-> - Should a real byte use a mask?
+    urlpatterns = [
+        ...
+        path('accounts/', include('uniauth.urls', namespace='uniauth')),
+    ]
 
-### How it works
+Lastly, add your desired institution CAS server(s). For example:
 
-<p align="center">
-  <a href="https://laowantong.github.io/paroxython/developer_manual/index.html">
-  <img src="docs/resources/waterfall.png">
-  </a>
-</p>
+    python manage.py add_institution "Example Institution" https://cas.example.edu/
 
-Paroxython starts from a given folder of **programs**. Its contents is parsed, and all features that meet the provided **specifications** are labelled and associated with their spans (e.g., `"assignment_lhs_identifier:a": 4, 6, 18` or `"loop_with_late_exit:while": 3-7, 20-29`).
+See the [commands section](https://github.com/lgoodridge/django-uniauth#commands) for more information regarding adding and removing institution CAS servers.
 
-These **labels** constitute only scattered knowledge. The next step is to map them onto a **taxonomy** designed with basic hierarchical constraints in mind (e.g., the fact that the introduction of the concept of early exit must come after that of loop, which itself requires that of control flow, is expressed by the _taxon_ `"flow/loop/exit/early"`).
+## Email Setup
 
-<p align="center">
-  <a href="https://laowantong.github.io/paroxython/user_manual/index.html#taxonomy">
-  <img src="docs/resources/tree.png" alt="A taxonomy.">
-  </a>
-  <br>
-  <em>Extract of the taxonomy generated from <a href="https://github.com/TheAlgorithms/Python">The Algorithms - Python</a>.<br>Click to jump to its full dynamic version in the user manual.</em>
-</p>
+Uniauth will send emails to users when necessary, such as to verify email addresses or for resetting passwords. During development, it may be sufficient to log these emails to the console - this is accomplished by adding the following to `settings.py`:
 
-Everything is then persisted in a tag **database**, which can later be filtered through a **pipeline** of commands, for instance:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-- _include_ only the programs which feature a recursive function;
-- _exclude_ this or that program you want to set aside for the exam;
-- “_impart_” all programs studied so far, _i.e_, consider that all the notions they implement are acquired.
+On production, a real email backend should be properly set up. See the docs on [setting up an SMTP backend](https://docs.djangoproject.com/en/2.2/topics/email/#smtp-backend) for more information.
 
-The result is a list of program **recommendations** ordered by increasing learning cost.
+## Settings
 
-### Example
+Uniauth uses the following settings from the `django.contrib.auth` package:
 
-Suppose that the `programs` directory contains [these simple programs](https://wiki.python.org/moin/SimplePrograms).
+ - [`LOGIN_URL`]( https://docs.djangoproject.com/en/2.2/ref/settings/#login-url): Determines where to redirect the user for login, particularly when using the `@login_required` decorator. Defaults to `/accounts/login/`.
+ - [`PASSWORD_RESET_TIMEOUT_DAYS`](https://docs.djangoproject.com/en/2.2/ref/settings/#password-reset-timeout-days): Determines how long password reset and email verification links are valid after being generated. Defaults to `3`.
 
-First, build [this tag database](https://github.com/laowantong/paroxython/blob/master/examples/simple/programs_db.json):
+The following custom settings are also used:
 
-```shell
-> paroxython collect programs
-Labelling 21 programs.
-Mapping taxonomy on 21 programs.
-Writing programs_db.json.
-```
+ - `UNIAUTH_ALLOW_SHARED_EMAILS`: Whether to allow a single email address to be linked to multiple profiles. Primary email addresses (the value set in the user's `email` field) must be unique regardless. Defaults to `True`.
+ - `UNIAUTH_ALLOW_STANDALONE_ACCOUNTS`: Whether to allow users to log in via an Institution Account (such as via CAS) without linking it to a Uniauth profile first. If set to `False`, users will be required to create or link a profile to their Institution Accounts before being able to access views protected by the `@login_required` decorator. Defaults to `True`.
+ - `UNIAUTH_FROM_EMAIL`: Determines the "from" email address when Uniauth sends an email, such as for email verification or password resets. Defaults to `uniauth@example.com`.
+ - `UNIAUTH_LOGIN_DISPLAY_STANDARD`: Whether the email address / password form is shown on the `login` view. If `False`, the form, "Create an Account" link, and "Forgot Password" link are hidden, and POST requests for the view will be ignored. Defaults to `True`.
+ - `UNIAUTH_LOGIN_DISPLAY_CAS`: Whether the option to sign in via CAS is shown on the `login` view. If `True`, there must be at least one `Institution` in the database to log into. Also, at least one of `UNIAUTH_LOGIN_DISPLAY_STANDARD` or `UNIAUTH_LOGIN_DISPLAY_CAS` must be `True`. Violating either of these constraints will result in an `ImproperlyConfigured` Exception. Defaults to `True`.
+ - `UNIAUTH_LOGIN_REDIRECT_URL`: Where to redirect the user after logging in, if no next URL is provided. Defaults to `/`.
+ - `UNIAUTH_LOGOUT_REDIRECT_URL`: Where to redirect the user after logging out, if no next URL is provided. If this setting is `None`, and a next URL is not provided, the logout template is rendered instead. Defaults to `None`.
+ - `UNIAUTH_LOGOUT_CAS_COMPLETELY`: Whether to log the user out of CAS on logout if the user originally logged in via CAS. Defaults to `False`.
+ - `UNIAUTH_MAX_LINKED_EMAILS`: The maximum number of emails a user can link to their profile. If this value is less than or equal to 0, there is no limit to the number of linked emails. Defaults to 20.
+ - `UNIAUTH_PERFORM_RECURSIVE_MERGING`: Whether to attempt to recursively merge One-to-One fields when merging users due to linking two existing accounts together. If `False`, One-to-One fields for the user being linked in will be deleted if the primary user has a non-null value for that field. Defaults to `True`.
+ - `UNIAUTH_USE_JWT_AUTH`: In a REST API + UI split architecture, set to `True` to save JWT `refresh` and `access` tokens in session cookie on the domain of the API. Tokens will then be retrievable by UI via `GET` request to `/jwt-tokens/`. Defaults to `False`.
 
-Then, filter it through [this pipeline](https://github.com/laowantong/paroxython/blob/master/examples/simple/programs_pipe.py):
+## Users in Uniauth
 
-```shell
-> paroxython recommend programs
-Processing 5 commands on 21 programs.
-  19 programs remaining after operation 1 (impart).
-  18 programs remaining after operation 2 (exclude).
-  12 programs remaining after operation 3 (exclude).
-  10 programs remaining after operation 4 (include).
-  10 programs remaining after operation 5 (hide).
-Dumped: programs_recommendations.md.
-```
+Uniauth supports any custom User model, so long as the model has `username` and `email` fields. The `email` serves as the primary identifying field within Uniauth, with the `username` being set to an arbitrary unique value to support packages that require it. Once a user's profile has been activated, other apps are free to change the `username` without disrupting Uniauth's behavior.
 
-Et voilà, [your recommendation report](https://github.com/laowantong/paroxython/blob/master/examples/simple/programs_recommendations.md)!
+Users are created by either completing the Sign Up form, or logging in via an `InstitutionAccount`. In the former case, they are given a username beginning with `tmp-`, followed by a unique suffix, and an empty `email` field. When the first email for a user has been verified, their profile is considered fully activated, the `email` field is set to the verified email, and the `username` field is arbitrarily set to that email address as well, unless it is taken. In the latter case, they are given a username describing how they were authenticated, along with the institution they signed into and their ID for that institution. They will keep this username and have an empty `email` field until they link their account to a verified Uniauth profile.
 
+Users may have multiple email addresses linked to their profile, any of which may be used for authentication (if one of the `LinkedEmail` [Uniauth backends](https://github.com/lgoodridge/django-uniauth#backends) are used), or for password reset. The address set in the user's `email` field is considered the "primary email", and is the only one that must be unique across all users. Users may change which linked email is their primary email address at any point via the `settings` page, so long as that primary email is not taken by another user.
 
-## Installation and test-drive
+Users may also have multiple `InstitutionAccounts` linked to their profile. These represent alternative ways of logging in, other than the standard username/email + password form. For example, if a University offers authentication via CAS, a user may link their CAS username for that university to their Uniauth profile, so that logging in with CAS authenticates them as the proper user.
 
-### Command line
+## Models
 
-Much to no one's surprise:
+Uniauth has the following models:
 
-```
-python -m pip install paroxython
-```
+### UserProfile:
 
-The following command should print a help message and exit:
+This model is automatically attached to each User upon creation, and extends the User model with the extra data Uniauth requires. The other Uniauth models all interact with the `UserProfile` model rather than the User model directly. Accessible via `user.uniauth_profile`.
 
-```
-paroxython --help
-```
+ - `get_display_id`: This method returns a more display-friendly ID for the user, using their username. If the User was created via CAS authentication, it will return their username without the institution prefix (so a User with username "cas-exampleinst-id123" would return "id123"). If their username is an email address, it will return everything before the "@" symbol (so "johndoe@example.com" would become "johndoe"). Otherwise the username is returned unmodified. These generated IDs are not guaranteed to be unique.
 
-### IPython magic command
+### LinkedEmail:
 
-If you use Jupyter notebook/lab, you've also just installed a so-called magic command. Load it like this:
+Represents an email address linked to a User's account. Accessible via `user.uniauth_profile.linked_emails`.
 
-```python
-%load_ext paroxython
-```
+### Institution:
 
-This should print `"paroxython 0.7.0 loaded."`. Run it on a cell of Python code:
+Represents an organization possesing an authentication server that can be logged into. You will need to add an Institution for each CAS server you wish to support. The `add_institution` and `remove_institution` commands are provided to help with this.
 
-```python
-%%paroxython                          # Lines
-def fibonacci(n):                     # 2
-    result = []                       # 3
-    (a, b) = (0, 1)                   # 4
-    while a < n:                      # 5
-        result.append(a)              # 6
-        (a, b) = (b, a + b)           # 7
-    return result                     # 8
-```
+### InstitutionAccount:
 
-| Taxon | Lines |
-|:--|:--|
-| `call/subroutine/method/sequence/list/append` | 6 |
-| `condition/inequality` | 5 |
-| `def/subroutine/function/impure` | 2-8 |
-| `def/subroutine/parameter/arg` | 2 |
-| `flow/loop/exit/late` | 5-7 |
-| `flow/loop/while` | 5-7 |
-| `meta/count/program/sloc/8` | 2-8 |
-| `meta/count/subroutine/sloc/7` | 2-8 |
-| `meta/count/variety/3` | 2-8 |
-| `meta/program` | 2-8 |
-| `operator/arithmetic/addition` | 7 |
-| `style/procedural` | 2-8 |
-| `type/number/integer/literal` | 4 |
-| `type/number/integer/literal/zero` | 4 |
-| `type/sequence/list` | 6 |
-| `type/sequence/list/literal/empty` | 3 |
-| `type/sequence/tuple/literal` | 4, 4, 7, 7 |
-| `var/assignment/explicit/parallel` | 4 |
-| `var/assignment/explicit/parallel/slide` | 7 |
-| `var/assignment/explicit/single` | 3 |
-| `var/assignment/implicit/parameter` | 2 |
-| `var/scope/local` | 2-8, 2-8, 2-8, 2-8 |
+Represents an account a User holds with a particular Institution. Accessible via `user.uniauth_profile.accounts`.
 
-As you can see, in this program, Paroxython identifies among others:
+## Backends
 
-- the use of the [procedural paradigm](https://en.wikipedia.org/wiki/Procedural_programming) (`style/procedural`);
-- an im[pure function](https://en.wikipedia.org/wiki/Pure_function) (`def/subroutine/function/impure`);
-- a `while` loop (`flow/loop/while`) with a late exit (`flow/loop/exit/late`);
-- a little bit of voodoo on lists (`type/sequence/list/literal/empty` and `call/subroutine/method/sequence/list/append`);
-- a simple [tuple assignment](https://en.wikibooks.org/wiki/Python_Programming/Tuples#Packing_and_Unpacking) (`var/assignment/explicit/parallel`). Note that we distinguish between explicit (with `=`) and implicit (parameters and iteration variables) assignments;
-- a “sliding” tuple assignment (`var/assignment/explicit/parallel/slide`). If the denomination is unique to us, the pattern itself occurs in a number of programs: implementations of [C-finite sequences](https://en.wikipedia.org/wiki/Constant-recursive_sequence) with C greater than 1, [Greatest Common Divisor](https://en.wikipedia.org/wiki/Greatest_common_divisor), [Quicksort](https://en.wikipedia.org/wiki/Quicksort), etc.
-- four local variables (`var/scope/local`);
-- an estimation of the variety of concepts involved (`meta/count/variety/***`), depending on the number of lines, features and distinct features.
+To use Uniauth as intended, either the `LinkedEmailBackend` or the `UsernameOrLinkedEmailBackend` should be included in your `AUTHENTICATION_BACKENDS` setting, along with the backends for any other authentication methods you wish to support.
 
-The magic command `%%paroxython` (corresponding to the subcommand [`tag`](https://laowantong.github.io/paroxython/cli_tag.html)) only scratches the surface of the system. As shown before, to estimate the learning cost of the features and get actionable recommendations, you will need first to construct the tag database with [`collect`](https://laowantong.github.io/paroxython/cli_collect.html), and then call [`recommend`](https://laowantong.github.io/paroxython/cli_recommend.html) on a pipeline of yours.
+### CASBackend:
 
-# Read them
+The `CASBackend` is inspired from the [`django-cas-ng backend`](https://github.com/mingchen/django-cas-ng/blob/master/django_cas_ng/backends.py) of the same name, and is largely a streamlined version of that class, modified to support multiple CAS servers. This backend's `authenticate` method accepts an `institution`, a `ticket`, and a `service` URL to redirect to on successful authentication, and attempts to verify that ticket with the institution's CAS server.
 
-Although this is still a work-in-progress, Paroxython should already be fairly well [documented](https://laowantong.github.io/paroxython/index.html):
+If verification succeeds, it looks for an `InstitutionAccount` matching that CAS username, and returns the user for the associated profile. If it succeeds, but there is no such `InstitutionAccount`, a temporary user is created, and the client will eventually be prompted to link this username to an existing Uniauth profile, or create one. If verification fails, authentication fails as well.
 
-- [User manual](https://laowantong.github.io/paroxython/user_manual/index.html):
-  - [write a command pipeline to get recommendations](https://laowantong.github.io/paroxython/user_manual/index.html#pipeline-tutorial),
-  - [prepare your program collections for better results](https://laowantong.github.io/paroxython/user_manual/index#preparing-your-program-collection),
-  - [understand and modify the taxonomic classification](https://laowantong.github.io/paroxython/user_manual/index#taxonomy),
-  - and more.
-- [Developer manual](https://laowantong.github.io/paroxython/developer_manual/index.html):
-  - [get a rough idea of the program structure and operations](https://laowantong.github.io/paroxython/developer_manual/index.html#bird-view),
-  - [use the provided helpers to contribute to the code](helper-programs),
-  - and more.
-- [Module reference](https://laowantong.github.io/paroxython/#header-submodules).
-- [Feature specifications](https://github.com/laowantong/paroxython/blob/master/paroxython/resources/spec.md): a document mixing prose, tests, regular expressions and SQL queries to describe which algorithmic features are recognized and how.
-- [User types](https://github.com/laowantong/paroxython/blob/master/paroxython/user_types.py): all objects of interest are precisely typed and checked by [mypy](http://mypy-lang.org).
+### LinkedEmailBackend:
 
-Finally, a [battery of examples](https://github.com/laowantong/paroxython/tree/master/examples) and [comprehensive test coverage](https://github.com/laowantong/paroxython/tree/master/tests) should help answer any remaining question.
+This backend's `authenticate` method accepts an email and password as keyword arguments, and checks the password against all users with that email linked to their account. If an `email` is not explicitly provided, a few other common field names (such as `email_address` and `username`) are checked and used if found.
+
+**Note:** Since the default Django admin page uses same Authentication Backends as the rest of the site, replacing the default `ModelBackend` with this one will result in usernames no longer being recognized on the admin login screen. You will need to log in with a superuser's email address and password, or use the below `UsernameOrLinkedEmailBackend` instead.
+
+### UsernameOrLinkedEmailBackend:
+
+Identical to the above class, except the provided `email` argument is also checked against each user's `username`.
+
+## Commands
+
+Uniauth provides the following management commands:
+
+ - `add_institution <name> <cas_server_url>`: Adds an `Institution` with the provided name and CAS server URL to the database. The `name` will be the text displayed in the CAS server dropdown on the Login page, and `cas_server_url` must point to the root URL of a CAS protocol compliant service. The command will return the institution's slug created from the provided name; this slug must be used when referring to the institution in other commands (such as `remove_institution`).
+     - Example Usage: `python manage.py add_institution "Example Inst" "https://www.example.com/cas/"`
+     - You may add the `--update-existing` option to update the CAS server URL of an existing institution with that name, or create one if it does not exist.
+ - `remove_institution <slug>`: Removes the `Institution` with the provided slug from the database. This action removes any `InstitutionAccounts` for that instiutiton in the process.
+ - `migrate_cas <slug>`: Migrates a project originally using CAS for authentication to using Uniauth. See the [User Migration](https://github.com/lgoodridge/django-uniauth#user-migration) section for more information.
+ - `migrate_custom`: Migrates a project originally using custom User authentication to using Uniauth. See the [User Migration](https://github.com/lgoodridge/django-uniauth#user-migration) section for more information.
+ - `flush_tmp_users [days]`: Deletes temporary users more than the specified number of days old from the database. The default number of days is 1.
+
+## Views
+
+The five views you will likely care about the most are `login`, `logout`, `signup`, `password-reset`, and `settings`:
+
+ - `/login/`: Displays a page allowing users to log in by entering a username/email and password, or via a supported backend, such as CAS. Also displays links for creating an account directly, and for resetting passwords.
+ - `/logout/`: Logs out the user. The behavior and redirect location of the log out is determined by the app's settings.
+ - `/signup/`: Prompts user for a primary email address, and a password, then sends a verification email to that address to activate the account.
+ - `/password-reset/`: Prompts user for an email address, then sends an email to that address containing a link for resetting the password. If no users have the entered email address linked to their account, no email is sent. If multiple users have that address linked, an email is sent for each potential user.
+ - `/settings/`: Allows users to perform account related actions, such as link more email addresses, choose the primary email address, link more Institution Accounts, or change their password.
+ - `/jwt-tokens/`: In REST API + UI split, allows UI to pop JWT tokens from session cookie on API domain via method `GET`. Returns `404` status if refresh and access tokens are not set.
+
+The remaining views are used internally by Uniauth, and should not be linked to from outside the app:
+
+ - `/cas-login/`: If a user chooses to log in via CAS, this view is called with the institution the user wishes to log into as an argument. The view will first redirect to the institution's CAS server and attempt to get a ticket, then return to the original page and attempt to authenticate with that ticket, via the `CASBackend`.
+ - `/link-to-account/`: If the user is logged into an `InstitutionAccount` not yet linked to a Uniauth profile, this view offers them the choice between linking it to an existing profile, or creating a new one, and linking it to that upon activation.
+ - `/link-from-account/`: If the user is logged into an activated Uniauth profile, this view gives them the opportunity to log into an institution via a supported backend, then link that `InstitutionAccount` to the current profile.
+ - `/verify-token/`: Intermediate page used during the email verification process. Verifies the token contained within the link sent to the email address.
+ - `/password-reset-*/`: Intermediate pages used during the password reset process. Are nearly identical to the [built-in password reset views](https://docs.djangoproject.com/en/2.2/topics/auth/default/#django.contrib.auth.views.PasswordResetView) provided by the `django.contrib.auth` package.
+
+Uniauth also implements its own version of the `@login_required` decorator, which ensure the user is logged in with an activated Uniauth profile before accessing the view. It may be used identically to the [built-in `@login_required` decorator](https://docs.djangoproject.com/en/2.2/topics/auth/default/#the-login-required-decorator), and should be added to your own views in place of the default version.
+
+## Template Customization
+
+The presentation of the views can be easily changed by overriding the appropriate template(s). For example, to add your own stylesheet to the Uniauth templates, create a `uniauth` folder in your `templates` directory, and add a `base-site.html` file to override the default one like so:
+
+    {% extends "uniauth/base.html" %}
+
+    {% load static from staticfiles %}
+
+    {% block shared-head %}
+    <link rel="shortcut icon" href="{% static 'uniauth/img/favicon.ico' %}"/>
+    <link href="{% static 'path/to/custom-style.css' %}" rel="stylesheet" type="text/css"/>
+    {% endblock %}
+
+    {% block body %}
+    <div id="wrapper">
+        <div id="page-wrapper" class="lavender-bg">
+            <div id="content-wrapper">
+                <div id="top-background"></div>
+                {% block content %}
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+    {% endblock %}
+
+More specific changes can be made by overriding the appropriate template.
+
+## URLs
+
+To add the Uniauth views to your app, you must add an entry to your `urlpatterns` which includes them with the namespace "uniauth". For example:
+
+    path('accounts/', include('uniauth.urls', namespace='uniauth'))
+
+Including the `uniauth.urls` module will add all of Uniauth's views to your app. However, if you only wish to use CAS authentication, you may choose to include the `uniauth.urls.cas_only` module instead, which will only expose the `login`, `cas-login`, and `logout` views.
+
+### URL Parameters
+
+All views except `/settings/` persist URL parameters to their final destination. This means you can add a query string to the `login` URL, and have it apply to the `UNIAUTH_LOGIN_REDIRECT_URL` page, for example.
+
+The only URL parameter that is not preserved is the `next` variable, which indicates the desired location to redirect to after business in the current view is completed. This variable is consumed upon successful redirection to that location, and can be used to dynamically control how the app behaves after visiting a view.
+
+## User Migration
+
+If you wish to use Uniauth with a project that already has users, a `UserProfile` (and, if applicable, `LinkedEmail` or `InstitutionAccount`) will need to be created for each existing user. You may use one of the provided commands to assist with this, provided your project meets one of the following conditions:
+
+ - If you were previously using CAS for authentication, and the username for each user matches the CAS ID (as would be the case if you were using a package like [django-cas-ng](https://github.com/mingchen/django-cas-ng)), you should first [add an Institution](https://github.com/lgoodridge/django-uniauth#commands) for the CAS server you were using, then use the `migrate_cas` command with the slug of the created Institution to peform the migration. A `UserProfile` will be created for all users, and the usernames of all Users will be changed to conform to Uniauth's expectations (to `cas-<institution_slug>-<original_username>`). To get the original username (without the CAS institution prefix), use the `get_display_id` method provided by the `UserProfile` model.
+ - If you were previously using custom user authentication (as in, Users would sign up with a username / email address and password), you may use the `migrate_custom` command to migrate the users. A `UserProfile` will be created for each migrated user, and a verified `LinkedEmail` will also be created for all users with a non-blank `email` field. Note that any users lacking a username / email or password will not be migrated. Also note that if the `LinkedEmailBackend` is used, users that don't have a `LinkedEmail` created will not be able to log in until one is linked.
+
+If your project does not fit either of these conditions, you will need to manually migrate the users as appropiate. Please create a `UserProfile` for each user, and `LinkedEmails` or `InstitutionAccounts` as appropiate.
+
+## Using JWT Authentication
+
+If you wish to use django-uniauth with JWT authentication (API + UI split), you will need to enable [SessionMiddleware](https://docs.djangoproject.com/en/3.1/topics/http/sessions/) in addition to the following settings:
+
+- `UNIAUTH_USE_JWT_AUTH` explicitly set to `True`.
+- `UNIAUTH_LOGIN_REDIRECT_URL` set to any route of your choice to your UI (ex: `http://your-ui-domain.com/`)
+- `UNIAUTH_LOGOUT_REDIRECT_URL` set to any route of your choice to your UI (ex: `http://your-ui-domain.com/`)
+
+Additionally, you may need the [django-cors-headers](https://pypi.org/project/django-cors-headers/) package to allow your UI to make requests with your API. From this package, you will need
+- `CORS_ALLOWED_ORIGINS` = `["http://you-ui-domain.com/"]`
+- `CORS_ALLOW_CREDENTIALS` = `True`
+
+On the UI, you can link your login/signup buttons to the respective django-uniauth views. Upon logging in, Uniauth will save your JWT tokens in a session cookie on the API's domain. To retrieve and save these tokens, make a `GET` request with `credentials: "include"` in the request headers.
+
+If you have created a [TokenObtainPairSerializer subclass](https://django-rest-framework-simplejwt.readthedocs.io/en/latest/customizing_token_claims.html) for customizing token claims, set the `TOKEN_OBTAIN_SERIALIZER` simplejwt setting accordingly, and Uniauth will use the custom serializer for its JWT tokens as well.
+
+Please refer to [django-rest-framework-simplejwt](https://pypi.org/project/djangorestframework-simplejwt/4.3.0/) for more information on customizing tokens (i.e. token expiration) and more.
+
+## Demo Application
+
+The source repository contains a `demo_app` directory which demonstrates how to setup a simple Django app to use Uniauth. This app has no functionality, and exists solely to show off the installable `uniauth` app. A quick-start guide for integrating Uniauth can be found [here](https://github.com/lgoodridge/django-uniauth/tree/master/demo_app).
+
+## Acknowledgements
+
+Special thank you to [Jérémie Lumbroso](https://github.com/jlumbroso) for his guidance in developing this package.
+
+[build-image]: https://img.shields.io/github/actions/workflow/status/lgoodridge/django-uniauth/run_tests.yml
+[build-url]: https://github.com/lgoodridge/django-uniauth/actions/workflows/run_tests.yml
+
+[djangover-image]: https://img.shields.io/pypi/djversions/django-uniauth.svg?label=django
+[djangover-url]: https://pypi.python.org/pypi/django-uniauth/
+
+[license-image]: https://img.shields.io/github/license/lgoodridge/django-uniauth.svg
+[license-url]: https://github.com/lgoodridge/django-uniauth/blob/master/LICENSE.md
+
+[pypi-image]: https://img.shields.io/pypi/v/django-uniauth.svg
+[pypi-url]: https://pypi.python.org/pypi/django-uniauth/
+
+[pyver-image]: https://img.shields.io/pypi/pyversions/django-uniauth.svg
+[pyver-url]: https://pypi.python.org/pypi/django-uniauth/
+
+[status-image]: https://img.shields.io/pypi/status/django-uniauth.svg
+[status-url]: https://pypi.python.org/pypi/django-uniauth/
