@@ -1,92 +1,40 @@
 name: CI
-on:
-  push:
-    branches:
-      - main
-      - /^v\d+\.\d+(\.(\d|x)+)?(-\S*)?$/
-  pull_request:
-    branches:
-      - main
-      - /^v\d+\.\d+(\.(\d|x)+)?(-\S*)?$/
 
-env:
-  TOX_FORCE_IGNORE_OUTCOME: "false"
+on: [push, pull_request]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python-version: [3.8, 3.8, 3.8, 3.8, pypy-3.6]
-        toxenv:
-          - lint,docs
-          - django20-py38-all
-          - django20-py38-all
-          - django20-pypy-3.6-all
-          - django21-py38-all
-          - django21-py38-all
-          - django21-py38-all
-          - django21-pypy-3.6-all
-          - django22-py38-all
-          - django22-py38-all
-          - django22-py38-all
-          - django22-pypy-3.6-all
-          - django30-py38-all
-          - django30-py38-all
-          - django30-py38-all
-          - django30-pypy-3.6-all
-          - django31-py38-all
-          - django31-py38-all
-          - django31-py38-all
-          - django31-pypy-3.6-all
-          - django31-py38-none
-          - django31-py38-amazon_ses
-          - django22-py38-all-old_urllib3
-        allow-failure: false
-    if: ${{ matrix.allow-failure == false }}
+        include:
+          - os: ubuntu-latest
+            python-version: 3.8
+          - os: ubuntu-latest
+            python-version: 3.8
+          - os: ubuntu-latest
+            python-version: 3.8
+          - os: ubuntu-latest
+            python-version: 3.9
+          - os: ubuntu-latest
+            python-version: pypy-3.6
+          - os: windows-latest
+            python-version: 3.8
+          - os: windows-latest
+            python-version: 3.9
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-
-      - name: Cache pip
-        uses: actions/cache@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
         with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: ${{ runner.os }}-pip-
-
+          python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
-          pip install tox
-
+          python -m pip install --upgrade pip
+          pip install coverage coveralls
       - name: Run tests
         run: |
-          tox -e ${{ matrix.toxenv }}
-
-  allow-failure-job:
-    runs-on: ubuntu-latest
-    needs: build
-    if: ${{ failure() }}
-    strategy:
-      matrix:
-        python-version: [3.8]
-        toxenv: [djangoDev-py38-all]
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Cache pip
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: ${{ runner.os }}-pip-
-
-      - name: Install dependencies
-        run: |
-          pip install tox
-
-      - name: Run tests
-        run: |
-          tox -e ${{ matrix.toxenv }}
-          echo "Allowing failure for ${{ matrix.toxenv }}"
+          coverage run -m unittest discover -s lexpy/tests
+          coverage report -i -m
+          coveralls
