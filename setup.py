@@ -1,71 +1,68 @@
-#!/usr/bin/env python
-# Generic setup script for single-package Python projects
-# by Thomas Perl <thp.io/about>
+#!/usr/bin/env python3
+#
+# Copyright (c) 2016 Grigori Goronzy <greg@chown.ath.cx>
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
 
-from distutils.core import setup
+import stcgal
+from setuptools import setup, find_packages
 
-import re
-import os
-import glob
+with open("doc/PyPI.md", "r") as fh:
+    long_description = fh.read()
 
-PACKAGE = 'mygpoclient'
-SCRIPT_FILE = os.path.join(PACKAGE, '__init__.py')
-
-main_py = open(SCRIPT_FILE).read()
-metadata = dict(re.findall("__([a-z]+)__ = '([^']+)'", main_py))
-docstrings = re.findall('"""(.*?)"""', main_py, re.DOTALL)
-
-# List the packages that need to be installed/packaged
-PACKAGES = (
-        PACKAGE,
+setup(
+    name = "stcgal",
+    version = stcgal.__version__,
+    packages = find_packages(exclude=["doc", "tests"]),
+    install_requires = ["pyserial>=3.0", "tqdm>=4.0.0"],
+    extras_require = {
+        "usb": ["pyusb>=1.0.0"]
+    },
+    entry_points = {
+        "console_scripts": [
+            "stcgal = stcgal.frontend:cli",
+        ],
+    },
+    description = "STC MCU ISP flash tool",
+    long_description = long_description,
+    long_description_content_type = "text/markdown",
+    keywords = "stc mcu microcontroller 8051 mcs-51",
+    url = "https://github.com/grigorig/stcgal",
+    author = "Grigori Goronzy",
+    author_email = "greg@kinoho.net",
+    license = "MIT License",
+    platforms = "any",
+    classifiers = [
+        "Development Status :: 5 - Production/Stable",
+        "Environment :: Console",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: POSIX",
+        "Operating System :: Microsoft :: Windows",
+        "Operating System :: MacOS",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
+        "Topic :: Software Development :: Embedded Systems",
+        "Topic :: Software Development",
+    ],
+    test_suite = "tests",
+    tests_require = ["PyYAML"],
 )
-
-SCRIPTS = glob.glob('bin/*')
-
-# Metadata fields extracted from SCRIPT_FILE
-AUTHOR_EMAIL = metadata['author']
-VERSION = metadata['version']
-WEBSITE = metadata['website']
-LICENSE = metadata['license']
-DESCRIPTION = docstrings[0].strip()
-if '\n\n' in DESCRIPTION:
-    DESCRIPTION, LONG_DESCRIPTION = DESCRIPTION.split('\n\n', 1)
-else:
-    LONG_DESCRIPTION = None
-
-# Extract name and e-mail ("Firstname Lastname <mail@example.org>")
-AUTHOR, EMAIL = re.match(r'(.*) <(.*)>', AUTHOR_EMAIL).groups()
-
-DATA_FILES = [
-    ('share/man/man1', glob.glob('man/*')),
-]
-
-CLASSIFIERS = [
-    'Development Status :: 5 - Production/Stable',
-    'Intended Audience :: Developers',
-    'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
-    'Operating System :: OS Independent',
-    'Programming Language :: Python',
-    'Programming Language :: Python :: 2',
-    'Programming Language :: Python :: 2.6',
-    'Programming Language :: Python :: 2.7',
-    'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.3',
-    'Programming Language :: Python :: 3.4',
-]
-
-setup(name=PACKAGE,
-      version=VERSION,
-      description=DESCRIPTION,
-      long_description=LONG_DESCRIPTION,
-      author=AUTHOR,
-      author_email=EMAIL,
-      license=LICENSE,
-      url=WEBSITE,
-      packages=PACKAGES,
-      scripts=SCRIPTS,
-      data_files=DATA_FILES,
-      download_url=WEBSITE+PACKAGE+'-'+VERSION+'.tar.gz',
-      classifiers=CLASSIFIERS,
-    )
-
