@@ -1,2 +1,2 @@
-beautifulsoup4
-regex>=2016.07.14
+in-toto==1.2.0
+securesystemslib==0.26.0
