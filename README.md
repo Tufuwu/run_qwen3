@@ -1,36 +1,41 @@
-PyFinTS
-=======
+RapidPro Python Client
+======================
 
-This is a pure-python implementation of FinTS (formerly known as HBCI), a
-online-banking protocol commonly supported by German banks.
+[![Build Status](https://travis-ci.org/rapidpro/rapidpro-python.svg?branch=master)](https://travis-ci.org/rapidpro/rapidpro-python)
+[![Coverage Status](https://coveralls.io/repos/github/rapidpro/rapidpro-python/badge.svg?branch=master)](https://coveralls.io/github/rapidpro/rapidpro-python)
+[![PyPI Release](https://img.shields.io/pypi/v/rapidpro-python.svg)](https://pypi.python.org/pypi/rapidpro-python/)
 
+Official Python client library for the [RapidPro](http://rapidpro.github.io/rapidpro/). Supports latest Python 3.
 
-[Read our documentation for more info](https://python-fints.readthedocs.io)
+Visit [here](http://rapidpro-python.readthedocs.org/) for complete documentation.
 
-Maintenance Status 
-------------------
+Installation
+------------
 
-This project is maintained, but with limited capacity. Working on this is takes a lot of time and testing since all banks do things differently and once you move a part here, you break an unexpected one over there. Therefore: Bugs will only be fixed by me if they occur with a bank where I have an account. New features will only be developed if I need them. PRs will be merged if they either have a very low risk of breaking things elsewhere (e.g. purely adding new commands) or if I can test them. In any case, things might take a little time until I have the bandwidth to focus on them. Sorry about that :( 
+```
+pip install rapidpro-python
+```
 
-Limitations
+Example
+-------
+
+```python
+from temba_client.v2 import TembaClient
+client = TembaClient('rapidpro.io', 'your-api-token')
+for contact_batch in client.get_contacts(group='Reporters').iterfetches(retry_on_rate_exceed=True):
+    for contact in contact_batch:
+        print(contact.name)
+```
+
+If you don't know your API token then visit the [API Explorer](http://rapidpro.io/api/v2/explorer)
+
+Development
 -----------
 
-* Only FinTS 3.0 is supported
-* Only PIN/TAN authentication is supported, no signature cards
-* Only the following operations are supported:
-  * Fetching bank statements
-  * Fetching balances
-  * Fetching holdings
-  * SEPA transfers and debits (only with required TAN and with specific TAN methods)
-* Supports Python 3.6+
+For discussions about future development, see the [RapidPro Developers Group](https://groups.google.com/forum/#!forum/rapidpro-dev).
 
-Credits and License
--------------------
+To run the tests:
 
-This library is maintained by Raphael Michel <mail@raphaelmichel.de>
-and features major contributions by Henryk Plötz.
-
-Further thanks for improving this library go out to:
-Daniel Nowak, Patrick Braune, Mathias Dalheimer, Christopher Grebs, Markus Schindler, and many more.
-
-License: LGPL
+```
+nosetests --with-coverage --cover-erase --cover-package=temba_client --cover-html
+```
