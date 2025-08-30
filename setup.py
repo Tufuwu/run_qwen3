@@ -1,37 +1,36 @@
+#!/usr/bin/env python
+
+import os
 from setuptools import setup
 
-with open('README.md', 'r') as fh:
-    long_description = fh.read()
+
+def read(fname):
+    return open(os.path.join(os.path.dirname(__file__), fname)).read()
+
 
 setup(
-    name='linkedin-jobs-scraper',
-    version='1.4.0',
-    author='Ludovico Fabbri',
-    author_email='ludovico.fabbri@gmail.com',
-    description='Scrape public available jobs on Linkedin using headless browser',
-    long_description=long_description,
-    long_description_content_type='text/markdown',
-    url='https://github.com/spinlud/py-linkedin-jobs-scraper.git',
-    packages=[
-        'linkedin_jobs_scraper',
-        'linkedin_jobs_scraper.chrome_cdp',
-        'linkedin_jobs_scraper.events',
-        'linkedin_jobs_scraper.exceptions',
-        'linkedin_jobs_scraper.filters',
-        'linkedin_jobs_scraper.query',
-        'linkedin_jobs_scraper.strategies',
-        'linkedin_jobs_scraper.utils',
-    ],
-    install_requires=[
-        'selenium',
-        'websocket-client'
-    ],
+    name="asserts",
+    version="0.11.0",
+    description="Stand-alone Assertions",
+    long_description=read("README.md"),
+    long_description_content_type="text/markdown",
+    author="Sebastian Rittau",
+    author_email="srittau@rittau.biz",
+    url="https://github.com/srittau/python-asserts",
+    packages=["asserts"],
+    package_data={"asserts": ["py.typed", "*.pyi"]},
+    python_requires=">=3.6",
+    license="MIT",
     classifiers=[
-        'Intended Audience :: Developers',
-        'Programming Language :: Python',
-        'Programming Language :: Python :: 3.6',
-        'License :: OSI Approved :: MIT License',
-        'Operating System :: OS Independent',
+        "Development Status :: 3 - Alpha",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: MIT License",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Topic :: Software Development :: Quality Assurance",
+        "Topic :: Software Development :: Testing",
     ],
-    python_requires='>=3.6',
 )
