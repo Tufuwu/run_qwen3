@@ -1,26 +1,24 @@
-name: Python CI
-on:
-  push:
-    branches:
-      - main
+name: Python Tests
+on: [push, pull_request]
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  test:
+    runs-on: ubuntu: xenial
     strategy:
       matrix:
-        python: ["3.8", "3.8", "3.8", "3.8", "3.8"]
+        python: ["3.8", "3.8", "3.8", "3.8", "3.8", "3.8"]
+        allow_failures:
+          - python: "3.8"
+          - python: "3.8"
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python }}
-    - name: Install dependencies
-      run: |
-        if [[ ${{ matrix.python }} == 2* ]]; then
-          pip install -r py2_requirements.txt
-        else
-          pip install -r py3_requirements.txt
-        fi
-    - name: Run tests
-      run: make test
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install dependencies
+        run: |
+          pip install tox-travis coveralls
+      - name: Run tests
+        run: tox
+      - name: Upload coverage
+        run: coveralls
