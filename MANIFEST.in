@@ -1,6 +1,6 @@
-include AUTHORS.rst
-include CONTRIBUTING.rst
-include HISTORY.rst
+include AUTHORS
 include LICENSE
+include CHANGELOG
 include README.rst
-recursive-include rest_framework_tus *.html *.png *.gif *js *.css *jpg *jpeg *svg *py
+recursive-include linkcheck/templates/linkcheck *
+recursive-include linkcheck/tests/media *
