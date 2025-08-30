@@ -1,23 +1,17 @@
-requirements:
-	pip install -r requirements.txt
+default: test
 
-requirements-test: requirements
-	pip install -r requirements-test.txt
+test: env
+	.env/bin/pytest tests
 
-dev: requirements-test
-	PORT=8080 python ./run.py
+.PHONY: doc
+doc: env
+	.env/bin/sphinx-build -a -W -E doc build/sphinx/html
 
-docker:
-	docker build --pull --rm -t reload .
 
-test:
-	python -m pytest
+env: .env/.up-to-date
 
-format:
-	python -m black .
+.env/.up-to-date: pyproject.toml Makefile
+	python3 -m venv .env
+	.env/bin/pip install -e .[testing,doc]
+	touch $@
 
-lint:
-	python -m flake8
-	python -m black --check .
-
-.PHONY: requirements requirements-test dev docker test format lint

@@ -1,7 +1,11 @@
-.env
-venv
-.venv
-node_modules/*
 *.pyc
-.cache
-package-lock.json
+.vagrant
+*.egg-info
+build
+.tox
+dist
+.eggs
+.env
+AUTHORS
+ChangeLog
+.venv

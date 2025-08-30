@@ -1,18 +1,13 @@
-# **_re:load_**
+![Hackerman](https://www.gravatar.com/avatar/2090713a50fcdae69b802e73815000a4?s=328&d=identicon&r=PG )
 
-An analytics ETL for BigQuery. Pairs well with [Redash](https://github.com/getredash/redash).
 
-## Run Server
+|-----------------------|-----------------------------------------------------------------------------------------|
+| Build Status          | ![Build Status](https://secure.travis-ci.org/getslash/flux.png?branch=master,develop)   |
+| Supported Versions    | ![Supported Versions](https://img.shields.io/pypi/pyversions/flux.svg)                  |
+| Latest Version        | ![Latest Version](https://img.shields.io/pypi/v/flux.svg)                               |
 
-`make dev`
 
-## Rebuild `ra.min.js`
+# What is Flux?
+Flux is a Python library enabling you to create virtual timelines and use them to test long processes.
 
-```
-npm install
-npm run build
-```
-
-## Integration testing
-
-Start the server and point your browser to `localhost:port/client/test.html`. Check that no javascript errors were thrown.
+For more details, see the documentation at http://flux.readthedocs.org
