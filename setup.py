@@ -1,28 +1,27 @@
+#!/usr/bin/env python
 from setuptools import setup
 
-
 setup(
-    name='pygelf',
-    version='0.4.2',
-    packages=['pygelf'],
-    description='Logging handlers with GELF support',
-    keywords='logging udp tcp ssl tls graylog2 graylog gelf',
-    author='Ivan Mukhin',
-    author_email='muhin.ivan@gmail.com',
-    url='https://github.com/keeprocking/pygelf',
-    long_description=open('README.rst').read(),
+    name='pycron',
+    version='3.0.0',
+    description='Simple cron-like parser, which determines if current datetime matches conditions.',
+    author='Kimmo Huoman',
+    author_email='kipenroskaposti@gmail.com',
     license='MIT',
-    classifiers=[
-        'Intended Audience :: Developers',
-        'License :: OSI Approved :: MIT License',
-        'Operating System :: OS Independent',
-        'Programming Language :: Python',
-        'Programming Language :: Python :: 3.9',
-        'Programming Language :: Python :: 3.10',
-        'Programming Language :: Python :: 3.11',
-        'Programming Language :: Python :: Implementation :: CPython',
-        'Programming Language :: Python :: Implementation :: PyPy',
-        'Topic :: System :: Logging',
-        'Topic :: Software Development :: Libraries :: Python Modules'
+    keywords='cron parser',
+    url='https://github.com/kipe/pycron',
+    packages=[
+        'pycron',
     ],
+    python_requires='>=3.5',
+    tests_require=[
+        "arrow>=0.12.0",
+        "coverage>=4.4.2",
+        "coveralls>=1.2.0",
+        "Delorean>=0.6.0",
+        "nose>=1.0",
+        "pendulum>=1.3.2",
+        "pytz>=2017.3",
+        "udatetime>=0.0.14"
+    ]
 )
