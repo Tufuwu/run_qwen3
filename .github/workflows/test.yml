@@ -1,29 +1,30 @@
-name: Python Tests
+name: Python CI
+
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python: ["3.8", "3.8", "3.8", "3.8", "3.8", "pypy-3.6.8"]
+        python-version: ["3.8", "3.8", "3.8"]
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python }}
-      - name: Install dependencies
-        run: python setup.py develop
-      - name: Run tests
-        run: python -m pytest
-      - name: Slack notification
-        uses: actions/slack-notify@v1
-        with:
-          webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
-          message: "Tests completed for Python ${{ matrix.python }}"
-
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Before install
+      run: |
+        python3 setup.py install
+        sudo apt-get -y update
+    - name: Install dependencies
+      run: |
+        pip install pytest-cov
+        pip install .[ja]
+    - name: Run tests
+      run: |
+        python3 -m pytest
+        ./test.sh
