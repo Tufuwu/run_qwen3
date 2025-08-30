@@ -1,36 +1,38 @@
-#!/usr/bin/env python
+from setuptools import setup, find_packages
 
-import os
-from setuptools import setup
-
-
-def read(fname):
-    return open(os.path.join(os.path.dirname(__file__), fname)).read()
-
+try:
+    long_description = open('README.md').read()
+except FileNotFoundError:
+    long_description = ''
 
 setup(
-    name="asserts",
-    version="0.11.0",
-    description="Stand-alone Assertions",
-    long_description=read("README.md"),
-    long_description_content_type="text/markdown",
-    author="Sebastian Rittau",
-    author_email="srittau@rittau.biz",
-    url="https://github.com/srittau/python-asserts",
-    packages=["asserts"],
-    package_data={"asserts": ["py.typed", "*.pyi"]},
-    python_requires=">=3.6",
-    license="MIT",
+    name='pytorch_memlab',
+    version='0.2.4',
+    licence='MIT',
+    description='A lab to do simple and accurate memory experiments on pytorch',
+    long_description=long_description,
+    long_description_content_type='text/markdown',
     classifiers=[
-        "Development Status :: 3 - Alpha",
-        "Intended Audience :: Developers",
-        "License :: OSI Approved :: MIT License",
-        "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
-        "Topic :: Software Development :: Quality Assurance",
-        "Topic :: Software Development :: Testing",
+        "Programming Language :: Python",
+        "Topic :: Software Development :: Libraries :: Python Modules",
+        ],
+    keywords='pytorch memory profile',
+    author='Kaiyu Shi',
+    author_email='skyisno.1@gmail.com',
+    url='https://github.com/Stonesjtu/pytorch_memlab',
+    license='MIT',
+    include_package_data=True,
+    zip_safe=True,
+    install_requires=[
+        'setuptools',
+        'calmsize',
+        'pandas>=0.18',
+        'torch>=1.4',
+        'numpy==1.19.5',
     ],
+    extras_require={
+        'ipython': ['IPython>=0.13'],
+        'test': ['pytest'],
+    },
+    packages=find_packages(),
 )
