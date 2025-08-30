@@ -1,7 +1,9 @@
-Django (>=1.7)
-pytz
+pbr
+pytest
 six
-typing; python_version < "3.5"
-infi.clickhouse-orm
-celery
-statsd
+PyYAML
+urllib3<2.0
+certifi
+jsonpath-rw-ext>=1.0.0
+wsgi-intercept>=1.8.1
+colorama
