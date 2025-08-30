@@ -1,18 +1,27 @@
-name: Python Build
+name: Python CI
+
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
+
 jobs:
-  build:
-    runs-on: ubuntu-22.04
+  test:
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        python: ["3.8", "3.8", "3.8", "3.8"]
+        python: ["3.8", "3.8", "3.8"]
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python }}
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python }}
-    - run: pip install -r requirements.txt
-    - run: python run_demo_md.py
+    - name: Install tox
+      run: pip install tox
+    - name: Determine TOXENV and run tox
+      run: |
+        TOXENV=$(tox --listenvs | grep "py${{ matrix.python }}-" | tr '\n' ',')
+        export TOXENV
+        tox
+
