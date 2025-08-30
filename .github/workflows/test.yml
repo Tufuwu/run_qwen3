@@ -1,23 +1,30 @@
-name: Python Tests
+name: Python package
+
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    branches:
+      - main
+  create:
+    tags: true
+
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu:22.04
     strategy:
       matrix:
-        python: ["3.8", "3.8", "3.8", "3.8"]
+        python: ['3.8', '3.8', '3.8', '3.8']
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python }}
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python }}
-    - name: Install dependencies
-      run: |
-        pip install flask nose
-    - name: Run tests
-      run: python setup.py test
+    - run: pip install -r requirements.txt
+    - run: pytest
+    - name: Deploy to PyPI
+      uses: pypa/gh-action-pypi-publish@v1.5.0
+      with:
+        username: __token__
+        password: ${{ secrets.PYPI_PASSWORD }}
+        distributions: sdist bdist_wheel
+        skip_existing: true
