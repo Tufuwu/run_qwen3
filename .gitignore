@@ -1,13 +1,15 @@
-# general things to ignore
 build/
 dist/
+.eggs/
 *.egg-info/
-*.egg
-*.py[cod]
 __pycache__/
+.pytest_cache/
+result_images/
+.DS_Store
+*.pyc
 *.so
-*~
-
-# due to using tox and pytest
-.tox
-.cache
+*.swp
+.python-version
+.vscode
+.coverage
+coverage.xml
