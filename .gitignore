@@ -1,11 +1,17 @@
-*.pyc
-.DS_Store
-.idea
-Fancy
-db.sqlite*
-dist
-*.egg-info
-.coding-ide
-dev.db
-build
+# vim swap files
+*.swp
 
+# python bytecode files
+*.pyc
+__pycache__/
+
+# setuptools files
+*.egg-info/
+
+# testing files
+.tox/
+.coverage
+
+# files generated for release
+dist/
+README.rst
