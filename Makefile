@@ -1,24 +1,12 @@
+release:
+	standard-version
 
-PYTHON=python
-PYTHONPATH=./
-SOURCE_DIR=./
-TESTS_DIR=./tests
+release-beta:
+	standard-version -p beta
 
-all: help
-
-help:
-	@echo "install      - install python package"
-	@echo "test         - run tests"
-	@echo "test-deps    - install test dependencies"
-
-install:
-	$(PYTHON) setup.py install
+publish:
+	python setup.py sdist
+	twine upload dist/*
 
 test:
-	$(PYTHON) -m unittest discover $(TESTS_DIR) -v
-
-deps:
-	pip install -r ./requirements.txt
-
-test-deps:
-	pip install -r ./test-requirements.txt
+	poetry run python -m pytest
