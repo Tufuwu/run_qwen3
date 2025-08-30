@@ -1,27 +1,30 @@
-name: Python CI
+name: CI
 on:
   push:
     branches:
       - main
 
-jobs:
-  linter:
-    runs-on: ubuntu-latest
-    env:
-      DJANGO_SETTINGS_MODULE: etip.settings.dev
-    steps:
-      - uses: actions/checkout@v2
-      - run: pip install flake8
-      - run: flake8 etip/
+services:
+  docker:
+    image: docker:stable
+    options: --privileged
 
-  test:
+jobs:
+  Flake8:
     runs-on: ubuntu-latest
-    env:
-      DJANGO_SETTINGS_MODULE: etip.settings.dev
-    strategy:
-      matrix:
-        python-version: [3.8, 3.8]
     steps:
       - uses: actions/checkout@v2
-      - run: pip install -r requirements.txt
-      - run: cd etip/ && python manage.py test
+      - name: Install flake8
+        run: pip install flake8
+      - name: Run flake8
+        run: flake8
+
+  Dockerfile-lint:
+    runs-on: ubuntu-latest
+    services:
+      - docker
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run Dockerfile linter
+        run: |
+          docker run -i hadolint/hadolint:v1.19.0-45-gef91156-alpine < Dockerfile
