@@ -1,25 +1,40 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='panoptescli',
-    version='1.1.3',
-    url='https://github.com/zooniverse/panoptes-cli',
-    author='Adam McMaster',
-    author_email='adam@zooniverse.org',
-    description=(
-        'A command-line client for Panoptes, the API behind the Zooniverse'
-    ),
-    packages=find_packages(),
+    name="django-statici18n",
+    version="2.1.1",
+    author="Sebastien Fievet",
+    author_email="zyegfryed@gmail.com",
+    url="http://django-statici18n.readthedocs.org/",
+    description="A Django app that provides helper for generating "
+    "Javascript catalog to static files.",
+    long_description=open("README.rst").read(),
+    package_dir={"": "src"},
+    packages=find_packages("src"),
     include_package_data=True,
+    zip_safe=False,
     install_requires=[
-        'Click>=6.7,<7.1',
-        'PyYAML>=5.1,<5.5',
-        'panoptes-client>=1.3,<2.0',
-        'humanize>=0.5.1,<1.1',
-        'pathvalidate>=0.29.0,<0.30',
+        "Django>=2.2",
+        "django-appconf>=1.0",
     ],
-    entry_points='''
-        [console_scripts]
-        panoptes=panoptes_cli.scripts.panoptes:cli
-    ''',
+    license="BSD",
+    classifiers=[
+        "Development Status :: 5 - Production/Stable",
+        "Environment :: Web Environment",
+        "Framework :: Django",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: BSD License",
+        "Operating System :: OS Independent",
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.4",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+    ],
+    project_urls={
+        "Source": "https://github.com/zyegfryed/django-statici18n",
+    },
 )
