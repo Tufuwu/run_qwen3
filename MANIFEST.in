@@ -1,6 +1,4 @@
-include COPYING
-include README.md
-include ChangeLog.rst
-include AUTHORS.rst
-include tox.ini
-recursive-include test *.html *.md *.py
+include LICENSE
+include *.rst
+include .flake8
+recursive-include tests *.pyi *.py
