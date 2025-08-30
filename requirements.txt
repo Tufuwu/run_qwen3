@@ -1,4 +1,7 @@
-# deps in this file are for local dev purposes only
-mkdocs
-pytest
-wheel
+Django (>=1.7)
+pytz
+six
+typing; python_version < "3.5"
+infi.clickhouse-orm
+celery
+statsd
