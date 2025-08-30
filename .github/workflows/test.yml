@@ -1,63 +1,30 @@
 name: CI
-on: [push]
+on: [push, pull_request]
 jobs:
-  test:
-    runs-on: ubuntu-22.04
+  build:
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        include:
-          - python: 3.8
-            env: TOXENV=pre-commit
-          - python: 3.8
-            env: TOXENV=py38-2.2
-          - python: 3.8
-            env: TOXENV=py38-2.2
-          - python: 3.8
-            env: TOXENV=py38-2.2
-          - python: 3.8
-            env: TOXENV=py38-2.2
-          - python: pypy-3.6
-            env: TOXENV=pypy-3.6-2.2
-          - python: 3.8
-            env: TOXENV=py38-3.0
-          - python: 3.8
-            env: TOXENV=py38-3.0
-          - python: 3.8
-            env: TOXENV=py38-3.0
-          - python: pypy-3.6
-            env: TOXENV=pypy-3.6-3.0
-          - python: 3.8
-            env: TOXENV=py38-3.1
-          - python: 3.8
-            env: TOXENV=py38-3.1
-          - python: 3.8
-            env: TOXENV=py38-3.1
-          - python: pypy-3.6
-            env: TOXENV=pypy-3.6-3.1
-          - python: 3.8
-            env: TOXENV=py38-3.2
-          - python: 3.8
-            env: TOXENV=py38-3.2
-          - python: 3.8
-            env: TOXENV=py38-3.2
-          - python: 3.9
-            env: TOXENV=py39-3.2
-          - python: pypy-3.6
-            env: TOXENV=pypy-3.6-3.2
-          - python: 3.8
-            env: TOXENV=py38-main
-            allow_failure: true
-          - python: 3.9
-            env: TOXENV=py39-main
-            allow_failure: true
-          - python: pypy-3.6
-            env: TOXENV=pypy-3.6-main
-            allow_failure: true
+        python: ["3.8", "3.8", "3.8"]
     steps:
-      - name: Install dependencies
-        run: |
-          pip install coverage tox
-      - name: Run tests
-        run: tox
-      - name: Upload coverage
-        run: coveralls
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Install Miniconda and set up environment
+      run: |
+        sudo apt-get update
+        if [[ "$python" == "3.8" ]]; then
+          wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh;
+        else
+          wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+        fi
+        bash miniconda.sh -b -p $HOME/miniconda
+        export PATH="$HOME/miniconda/bin:$PATH"
+        hash -r
+        conda config --set always_yes yes --set changeps1 no
+        conda update -q conda
+        conda create -q -n test python=$python
+        source activate test
+        conda install altair matplotlib numba numpy pandas pyteomics pytest -c defaults -c bioconda -c conda-forge
+        python setup.py install
+    - name: Run tests
+      run: pytest
