@@ -1,57 +1,53 @@
+"""Setup file for mysensors package."""
+from pathlib import Path
+
 from setuptools import setup, find_packages
-import os
 
-with open('tenable/version.py', 'r') as vfile:
-    exec(vfile.read())
+PROJECT_DIR = Path(__file__).parent.resolve()
+VERSION = (PROJECT_DIR / "mysensors" / "VERSION").read_text().strip()
 
-try:
-    long_description = open(
-        os.path.join(
-            os.path.abspath(os.path.dirname(__file__)),
-            'README.rst')).read()
-except:
-    long_description = 'Please refer to https://pytenable.readthedocs.io'
-    print('! could not read README.rst file.')
+README_FILE = PROJECT_DIR / "README.md"
+LONG_DESCR = README_FILE.read_text(encoding="utf-8")
+
+REQUIRES = [
+    "click",
+    "crcmod>=1.7",
+    "getmac",
+    "IntelHex>=2.2.1",
+    "pyserial>=3.4",
+    "pyserial-asyncio>=0.4",
+    "voluptuous>=0.11.1",
+]
+EXTRAS = {"mqtt-client": ["paho-mqtt"]}
+
 
 setup(
-    name='pyTenable',
-    version=version,
-    description='Python library to interface into Tenable\'s products and applications',
-    author='Tenable, Inc.',
-    long_description=long_description,
-    author_email='smcgrath@tenable.com',
-    url='https://github.com/tenable/pytenable',
-    license='MIT',
+    name="pymysensors",
+    version=VERSION,
+    description="Python API for talking to a MySensors gateway",
+    long_description=LONG_DESCR,
+    long_description_content_type="text/markdown",
+    url="https://github.com/theolind/pymysensors",
+    author="Theodor Lindquist",
+    author_email="theodor.lindquist@gmail.com",
+    license="MIT License",
+    install_requires=REQUIRES,
+    extras_require=EXTRAS,
+    packages=find_packages(exclude=["tests", "tests.*"]),
+    python_requires=">=3.5.3",
+    entry_points={"console_scripts": ["pymysensors = mysensors.cli:cli"]},
+    keywords=["sensor", "actuator", "IoT", "DYI"],
+    zip_safe=True,
     classifiers=[
-        'Development Status :: 5 - Production/Stable',
-        'Intended Audience :: Developers',
-        'Topic :: Software Development',
-        'Topic :: Software Development :: Libraries',
-        'Topic :: Software Development :: Libraries :: Application Frameworks',
-        'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
+        "Intended Audience :: Developers",
+        "Intended Audience :: End Users/Desktop",
+        "License :: OSI Approved :: MIT License",
+        "Natural Language :: English",
+        "Operating System :: OS Independent",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Topic :: Home Automation",
     ],
-    keywords='tenable tenable_io securitycenter containersecurity',
-    packages=find_packages(exclude=['docs', 'tests']),
-    install_requires=[
-        'requests>=2.19',
-        'python-dateutil>=2.6',
-        'semver>=2.8.1',
-        'ipaddress>=1.0.22',
-        'restfly>=1.3.5',
-        'marshmallow>=3.6',
-        'python-box>=4.0',
-    ],
-    extras_require={
-        'NessusReportv2': ['defusedxml>=0.5.0'],
-        'PWCertAuth': ['requests-pkcs12>=1.3'],
-        'docker': ['docker>=3.7.2'],
-        'complete': [
-            'defusedxml>=0.5.0',
-            'requests-pkcs12>=1.3',
-            'docker>=3.7.2',
-        ]
-    }
 )
