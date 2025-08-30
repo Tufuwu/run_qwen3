@@ -1,107 +1,24 @@
 name: Python CI
-
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-
+on: [push, pull_request]
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu:22.04
     strategy:
       matrix:
-        include:
-          - python: 3.8
-            env: TOXENV=py38-django22
-          - python: 3.8
-            env: TOXENV=py38-django22
-          - python: 3.8
-            env: TOXENV=py38-django22
-          - python: 3.9
-            env: TOXENV=py39-django22
-          - python: 3.8
-            env: TOXENV=py38-django30
-          - python: 3.8
-            env: TOXENV=py38-django30
-          - python: 3.8
-            env: TOXENV=py38-django30
-          - python: 3.9
-            env: TOXENV=py39-django30
-          - python: 3.8
-            env: TOXENV=py38-django31
-          - python: 3.8
-            env: TOXENV=py38-django31
-          - python: 3.8
-            env: TOXENV=py38-django31
-          - python: 3.9
-            env: TOXENV=py39-django31
-          - python: 3.8
-            env: TOXENV=py38-django32
-          - python: 3.8
-            env: TOXENV=py38-django32
-          - python: 3.8
-            env: TOXENV=py38-django32
-          - python: 3.9
-            env: TOXENV=py39-django32
-          - python: 3.8
-            env: TOXENV=py38-django22
-            arch: ppc64le
-          - python: 3.8
-            env: TOXENV=py38-django22
-            arch: ppc64le
-          - python: 3.8
-            env: TOXENV=py38-django22
-            arch: ppc64le
-          - python: 3.9
-            env: TOXENV=py39-django22
-            arch: ppc64le
-          - python: 3.8
-            env: TOXENV=py38-django30
-            arch: ppc64le
-          - python: 3.8
-            env: TOXENV=py38-django30
-            arch: ppc64le
-          - python: 3.8
-            env: TOXENV=py38-django30
-            arch: ppc64le
-          - python: 3.9
-            env: TOXENV=py39-django30
-            arch: ppc64le
-          - python: 3.8
-            env: TOXENV=py38-django31
-            arch: ppc64le
-          - python: 3.8
-            env: TOXENV=py38-django31
-            arch: ppc64le
-          - python: 3.8
-            env: TOXENV=py38-django31
-            arch: ppc64le
-          - python: 3.9
-            env: TOXENV=py39-django31
-            arch: ppc64le
-          - python: 3.8
-            env: TOXENV=py38-django32
-            arch: ppc64le
-          - python: 3.8
-            env: TOXENV=py38-django32
-            arch: ppc64le
-          - python: 3.8
-            env: TOXENV=py38-django32
-            arch: ppc64le
-          - python: 3.9
-            env: TOXENV=py39-django32
-            arch: ppc64le
-
+        python: [3.8, 3.8]
+        fast_finish: true
     steps:
-      - uses: actions/checkout@v3
-      - name: Cache pip
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/pip
-          key: ${{ hashFiles('**/requirements.txt') }}
-      - name: Install tox
-        run: pip install tox
-      - name: Run tox
-        run: tox
-
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python }}
+    - name: Install dependencies
+      run: |
+        pip install coverage codecov
+    - name: Install package
+      run: python setup.py develop
+    - name: Run tests
+      run: coverage run -m unittest discover
+    - name: Upload coverage
+      run: codecov

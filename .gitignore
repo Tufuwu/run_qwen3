@@ -1,16 +1,13 @@
+# Python
 *.pyc
-.*swp
-build/
-dist/
-superview.egg-info/
-django_superview.egg-info
-versiontools-*.egg
-*.egg-info
-.project
-.pydevproject
-.idea
-.settings
-/testing/venv
-doc/index.html
-.tox
-env/
+/*.egg-info
+/.eggs
+/dist
+
+# coverage
+/.coverage
+/htmlcov
+
+# tests
+*.vcd
+*.gtkw

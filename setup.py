@@ -1,66 +1,32 @@
-#!/usr/bin/env python3
+from setuptools import setup, find_packages
 
-from setuptools import setup
+
+def scm_version():
+    def local_scheme(version):
+        if version.tag and not version.distance:
+            return version.format_with("")
+        else:
+            return version.format_choice("+{node}", "+{node}.dirty")
+    return {
+        "relative_to": __file__,
+        "version_scheme": "guess-next-dev",
+        "local_scheme": local_scheme
+    }
+
 
 setup(
-    name = "django-jinja",
-    version = "2.9.1",
-    description = "Jinja2 templating language integrated in Django.",
-    long_description = open("README.rst").read(),
-    long_description_content_type='text/x-rst',
-    keywords = "django, jinja2",
-    author = "Andrey Antukh",
-    author_email = "niwi@niwi.be",
-    maintainer = "Asif Saif Uddin",
-    maintainer_email = "auvipy@gmail.com",
-    url = "https://github.com/niwinz/django-jinja",
-    license = "BSD",
-    packages = [
-        "django_jinja",
-        "django_jinja.builtins",
-        "django_jinja.management",
-        "django_jinja.management.commands",
-        "django_jinja.contrib",
-        "django_jinja.contrib._pipeline",
-        "django_jinja.contrib._pipeline.templatetags",
-        "django_jinja.contrib._easy_thumbnails",
-        "django_jinja.contrib._easy_thumbnails.templatetags",
-        "django_jinja.contrib._humanize",
-        "django_jinja.contrib._humanize.templatetags",
-        "django_jinja.contrib._subdomains",
-        "django_jinja.contrib._subdomains.templatetags",
-        "django_jinja.views",
-        "django_jinja.views.generic",
-    ],
-    include_package_data = True,
-    package_data = {
-        "django_jinja": ["contrib/_pipeline/templates/pipeline/*.jinja"],
+    name="nmigen-soc",
+    use_scm_version=scm_version(),
+    author="whitequark",
+    author_email="whitequark@whitequark.org",
+    description="System on Chip toolkit for nMigen",
+    #long_description="""TODO""",
+    license="BSD",
+    setup_requires=["wheel", "setuptools", "setuptools_scm"],
+    install_requires=["nmigen>=0.2,<0.5"],
+    packages=find_packages(),
+    project_urls={
+        "Source Code": "https://github.com/nmigen/nmigen-soc",
+        "Bug Tracker": "https://github.com/nmigen/nmigen-soc/issues",
     },
-    python_requires = ">=3.6",
-    install_requires = [
-        "jinja2<3.1",
-        "django>=2.2",
-    ],
-    tests_require = [
-        "pytz",
-    ],
-    classifiers = [
-        "Development Status :: 5 - Production/Stable",
-        "Framework :: Django",
-        "Framework :: Django :: 2.2",
-        "Framework :: Django :: 3.0",
-        "Framework :: Django :: 3.1",
-        "Framework :: Django :: 3.2",
-        "Intended Audience :: Developers",
-        "License :: OSI Approved :: BSD License",
-        "Operating System :: OS Independent",
-        "Programming Language :: Python",
-        "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3 :: Only",
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
-        "Topic :: Internet :: WWW/HTTP",
-    ]
 )
