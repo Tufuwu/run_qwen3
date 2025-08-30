@@ -1,56 +1,91 @@
-# Python software webauthn token
+[![Documentation Status](https://readthedocs.org/projects/curtsies/badge/?version=latest)](https://readthedocs.org/projects/curtsies/?badge=latest)
+![Curtsies Logo](http://ballingt.com/assets/curtsiestitle.png)
 
-[![Build Status](https://travis-ci.org/bodik/soft-webauthn.svg?branch=master)](https://travis-ci.org/bodik/soft-webauthn)
+Curtsies is a Python 3.6+ compatible library for interacting with the terminal.
+This is what using (nearly every feature of) curtsies looks like:
 
-Package is used for testing webauthn enabled web applications. The use-case is
-authenticator and browser emulation during web application development
-continuous integration.
+```python
+import random
+import sys
 
-`SoftWebauthnDevice` class interface exports basic navigator interface used for
-webauthn features:
+from curtsies import FullscreenWindow, Input, FSArray
+from curtsies.fmtfuncs import red, bold, green, on_blue, yellow
 
-* `SoftWebauthnDevice.create(...)` aka `navigator.credentials.create(...)`
-* `SoftWebauthnDevice.get(...)` aka `navigator.credentials.get(...)`
+print(yellow('this prints normally, not to the alternate screen'))
 
-To support authentication tests without prior registration/attestation, the
-class exports additional functions:
-
-* `SoftWebauthnDevice.cred_init(rp_id, user_handle)`
-* `SoftWebauthnDevice.cred_as_attested()`
-
-There is no standard/specification for *Client* (browser) to *Relying party*
-(web application) communication. Therefore the class should be be used in a web
-application test suite along with other code handling webapp specific tasks
-such as conveying *CredentialCreationOptions* from webapp and
-*PublicKeyCredential* back to the webapp.
-
-The example usage can be found in `tests/test_interop.py` (Token/Client vs RP
-API) and `tests/test_example.py` (Token/Client vs RP HTTP). Despite internal
-usage of `yubico/python-fido2` package, the project should be usable againts
-other RP implementations as well.
-
-## References
-
-* https://w3c.github.io/webauthn
-* https://webauthn.guide/
-* https://github.com/Yubico/python-fido2
-
-## Development
-
+with FullscreenWindow() as window:
+    a = FSArray(window.height, window.width)
+    msg = red(on_blue(bold('Press escape to exit, space to clear.')))
+    a[0:1, 0:msg.width] = [msg]
+    window.render_to_terminal(a)
+    with Input() as input_generator:
+        for c in input_generator:
+            if c == '<ESC>':
+                break
+            elif c == '<SPACE>':
+                a = FSArray(window.height, window.width)
+            else:
+                s = repr(c)
+                row = random.choice(range(window.height))
+                column = random.choice(range(window.width-len(s)))
+                color = random.choice([red, green, on_blue, yellow])
+                a[row, column:column+len(s)] = [color(s)]
+            window.render_to_terminal(a)
 ```
-git clone https://github.com/bodik/soft-webauthn
-cd soft-webauthn
-ln -s ../../git_hookprecommit.sh .git/hooks/pre-commit
 
-# OPTIONAL, create and activate virtualenv
-make venv
-. venv/bin/activate
+Paste it in a `something.py` file and try it out!
 
-# install dependencies
-make install-deps
+Installation: `pip install curtsies`
 
-# profit
-make lint
-make test
-make coverage
-```
+[Documentation](http://curtsies.readthedocs.org/en/latest/)
+
+Primer
+------
+
+[FmtStr](http://curtsies.readthedocs.org/en/latest/FmtStr.html) objects are strings formatted with
+colors and styles displayable in a terminal with [ANSI escape sequences](http://en.wikipedia.org/wiki/ANSI_escape_code>`_).
+
+![](https://i.imgur.com/bRLI134.png)
+
+[FSArray](http://curtsies.readthedocs.org/en/latest/FSArray.html) objects contain multiple such strings
+with each formatted string on its own row, and FSArray
+objects can be superimposed on each other
+to build complex grids of colored and styled characters through composition.
+
+(the import statement shown below is outdated)
+
+![](http://i.imgur.com/rvTRPv1.png)
+
+Such grids of characters can be rendered to the terminal in alternate screen mode
+(no history, like `Vim`, `top` etc.) by [FullscreenWindow](http://curtsies.readthedocs.org/en/latest/window.html#curtsies.window.FullscreenWindow) objects
+or normal history-preserving screen by [CursorAwareWindow](http://curtsies.readthedocs.org/en/latest/window.html#curtsies.window.CursorAwareWindow) objects.
+User keyboard input events like pressing the up arrow key are detected by an
+[Input](http://curtsies.readthedocs.org/en/latest/input.html) object.
+
+Examples
+--------
+
+* [Tic-Tac-Toe](/examples/tictactoeexample.py)
+
+![](http://i.imgur.com/AucB55B.png)
+
+* [Avoid the X's game](/examples/gameexample.py)
+
+![](http://i.imgur.com/nv1RQd3.png)
+
+* [Bpython-curtsies uses curtsies](http://ballingt.com/2013/12/21/bpython-curtsies.html)
+
+[![](http://i.imgur.com/r7rZiBS.png)](http://www.youtube.com/watch?v=lwbpC4IJlyA)
+
+* [More examples](/examples)
+
+About
+-----
+
+* [Curtsies Documentation](http://curtsies.readthedocs.org/en/latest/)
+* Curtsies was written to for [bpython-curtsies](http://ballingt.com/2013/12/21/bpython-curtsies.html)
+* `#bpython` on irc is a good place to talk about Curtsies, but feel free
+  to open an issue if you're having a problem!
+* Thanks to the many contributors!
+* If all you need are colored strings, consider one of these [other
+  libraries](http://curtsies.readthedocs.io/en/latest/FmtStr.html#fmtstr-rationale)!

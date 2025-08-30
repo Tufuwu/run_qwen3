@@ -1,24 +1,49 @@
-import setuptools
+from setuptools import setup
+import ast
+import os
+import io
 
-with open('README.md', 'r') as fh:
-    long_description = fh.read()
 
-setuptools.setup(
-    name='soft-webauthn',
-    version='0.1.3',
-    author='Radoslav Bodó',
-    author_email='bodik@cesnet.cz',
-    description='Python webauthn software authenticator',
-    long_description=long_description,
-    long_description_content_type='text/markdown',
-    url='https://github.com/bodik/soft-webauthn',
-    py_modules=['soft_webauthn'],
+def version():
+    """Return version string."""
+    with open(os.path.join("curtsies", "__init__.py")) as input_file:
+        for line in input_file:
+            if line.startswith("__version__"):
+                return ast.parse(line).body[0].value.s
+
+
+def long_description():
+    with open("README.md", encoding="utf-8") as f:
+        return f.read()
+
+
+setup(
+    name="curtsies",
+    version=version(),
+    description="Curses-like terminal wrapper, with colored strings!",
+    long_description=long_description(),
+    long_description_content_type="text/markdown",
+    url="https://github.com/bpython/curtsies",
+    author="Thomas Ballinger",
+    author_email="thomasballinger@gmail.com",
+    license="MIT",
+    packages=["curtsies"],
     install_requires=[
-        'fido2>=0.8,<1.0.0',
-        'cryptography'
+        "blessings>=1.5",
+        "wcwidth>=0.1.4",
+    ],
+    tests_require=[
+        "pyte",
+        "pytest",
     ],
     classifiers=[
-        'Programming Language :: Python :: 3',
-        'License :: OSI Approved :: MIT License',
+        "Development Status :: 3 - Alpha",
+        "Environment :: Console",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: POSIX",
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 3",
     ],
+    zip_safe=False,
 )
