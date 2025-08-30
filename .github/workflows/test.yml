@@ -1,35 +1,29 @@
-name: CI
-on: [push, pull_request]
+name: Python Tests
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.8, pypy-3.6, 3.8, 3.8, 3.8, 3.8]
-        include:
-          - python-version: 3.8
-            runs-on: ubuntu:22.04
-    env:
-      LANG:
+        python-version: [3.8, 3.8, 3.8, 3.8, 3.8, 3.9]
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Install dependencies
-        run: python setup.py --quiet install
-      - name: Run tests
-        run: |
-          python test_docformatter.py
-          docformatter setup.py
-      - name: Generate coverage
-        if: ${{ success }}
-        run: |
-          pip install --quiet coverage
-          make coverage
-      - name: Upload coverage
-        if: ${{ success }}
-        run: |
-          pip install --quiet coveralls
-          coveralls
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        pip install .
+        pip install -r requirements.txt
+        pip install rednose coverage coveralls
+    - name: Run tests
+      run: |
+        nosetests test --rednose --verbosity=3 --with-coverage --cover-package ncclient
+    - name: Upload coverage
+      run: coveralls
+      if: ${{ success }}
