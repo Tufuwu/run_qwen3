@@ -1,27 +1,23 @@
-name: Python CI
-on: [push, pull_request]
+name: CI
+
+on: [push]
+
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python: ["3.8", "3.8", "3.8", "3.9"]
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python }}
-    - name: Install dependencies
-      run: |
-        pip install .[test] codecov
-        rm -f $HOME/.cache/pip/log/debug.log
-    - name: Cache pip
-      uses: actions/cache@v2
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-        restore-keys: ${{ runner.os }}-pip-
-    - name: Run tests
-      run: ./run-tests.py
-    - name: Upload coverage
-      uses: codecov/codecov-action@v2
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install dependencies
+        run: |
+          pip install -r requirements-dev.txt
+          pip install -e .
+      - name: Run tests
+        run: pytest pywnedpasswords/tests/
+      - name: Lint with flake8
+        run: flake8 pywnedpasswords
+      - name: Check formatting with black
+        run: black --safe --check
