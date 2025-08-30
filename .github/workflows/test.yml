@@ -1,33 +1,26 @@
-name: Python Tests
-
-on:
-  push:
-    branches:
-      - main
-      - dev
-
+name: Build and Check
+on: [push]
 jobs:
-  test:
+  build-check:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.8", "3.8", "3.8", "pypy-3.6"]
-        test-suite: ["adddelete", "compartmentedmodel", "networkdynamics", "sir", "sirs", "sir_fixedrecovery", "sis", "sis_fixedrecovery", "seir", "stochasticrates", "monitor", "generators", "loci", "percolate"]
     steps:
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
+    - uses: actions/checkout@v2
+    - name: Run link-format-chk.sh
       run: |
-        pip install -r requirements.txt
-        pip install coveralls
-    - name: Install package
-      run: python setup.py install
-    - name: Run tests
+        ./scripts/link-format-chk.sh
+    - name: Generate table
       run: |
-        coverage run --include './epydemic/*' -m nose test/test_${{ matrix.test-suite }}.py
-    - name: Upload coverage
-      if: ${{ success }}
-      run: coveralls
-
+        ./scripts/buildtable.pl > /tmp/table.mediawiki || exit 1
+    - name: Compare current and previous commit
+      run: |
+        diff README.mediawiki /tmp/table.mediawiki | grep '^[<>] |' > /tmp/after.diff || true
+        if git checkout HEAD^ && ./scripts/buildtable.pl > /tmp/table.mediawiki 2>/dev/null; then
+          diff README.mediawiki /tmp/table.mediawiki | grep '^[<>] |' > /tmp/before.diff || true
+          newdiff=$(diff -s /tmp/before.diff /tmp/after.diff -u | grep '^+')
+          if [ -n "$newdiff" ]; then
+            echo "$newdiff"
+            exit 1
+          fi
+        else
+          echo 'Cannot build previous commit table for comparison'
+        fi
