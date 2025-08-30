@@ -1,18 +1,36 @@
-name: Python CI
-on: [push]
+name: Python Tests
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  test:
+    runs-on: ${{ matrix.image }}
     strategy:
       matrix:
-        python: ["3.8", "3.8"]
+        include:
+          - python: 3.8
+            image: python:3.8
+          - python: 3.3
+            image: python:3.3
+          - python: 3.8
+            image: python:3.8
+          - python: 3.8
+            image: python:3.8
+          - python: 3.8
+            image: python:3.8
+          - python: 3.8
+            image: python:3.8
+          - python: pypy-3.6
+            image: pypy-3.6:latest
+
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python }}
-      - name: Install tox-travis
-        run: pip install tox-travis
-      - name: Run tests
-        run: tox
+      - run: pip install -r requirements-test.txt
+      - run: python -m unittest discover -s tests
+      - run: coverage run run_tests.py && coverage report -m
+
+notifications:
+  email: false
