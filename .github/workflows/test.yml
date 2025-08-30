@@ -1,23 +1,26 @@
 name: Python CI
-on: [push]
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 jobs:
-  test:
+  build-test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.8, 3.8, 3.8, pypy-3.6]
+        python-version: [3.8, 3.8, 3.8, 3.8, 3.8, 3.9, 3.8, pypy-3.6]
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: pip install .
-    - name: Run tests
-      run: python setup.py test
-notifications:
-  email:
-    recipients:
-      - code@ramiro.org
-    on_failure: change
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          pip install bitstring>=3.1.3
+          pip install pyflakes
+      - name: Run tests
+        run: python setup.py test
+      - name: Run pyflakes
+        run: pyflakes pybufrkit tests *.py
