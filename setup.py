@@ -1,58 +1,137 @@
-"""
-Setup for pygount.
-
-Developer cheat sheet
----------------------
-
-Tag a release (simply replace ``1.x.x`` with the current version number)::
-
-  $ git tag -a -m "Tagged version 1.x.x" v1.x.x
-  $ git push --tags
-
-Upload release to PyPI::
-
-  $ python3 setup.py bdist_wheel
-  $ twine upload dist/*.whl
-"""
-# Copyright (c) 2016-2020, Thomas Aglassinger.
-# All rights reserved. Distributed under the BSD License.
 import os
-from setuptools import setup, find_packages
+import sys
+from shutil import rmtree
 
-from pygount import __version__
+from setuptools import Command
+from setuptools import find_packages
+from setuptools import setup
+
+# Package meta-data.
+NAME = 'django-inlinecss'
+SRC_DIR = 'django_inlinecss'
+DESCRIPTION = 'A Django app useful for inlining CSS (primarily for e-mails)'
+URL = 'https://github.com/roverdotcom/django-inlinecss'
+EMAIL = 'philip@rover.com'
+AUTHOR = 'Philip Kimmey'
+REQUIRES_PYTHON = '>=3.8'
+VERSION = None
+
+# What packages are required for this module to be executed?
+REQUIRED = [
+    'Django>=3.2',
+    'pynliner',
+    'future>=0.16.0',
+]
+
+# What packages are required only for tests?
+TESTS = [
+    'mock==5.1.0',
+    'pytest==8.0.1',
+    'pytest-django==4.8.0',
+]
+
+# What packages are optional?
+EXTRAS = {
+    'flake8': [
+        'flake8==7.0.0',
+        'flake8-isort==6.1.1',
+        'isort==5.13.2',
+        'testfixtures==8.0.0',
+    ],
+    "tests": TESTS,
+}
+
+here = os.path.abspath(os.path.dirname(__file__))
 
 
-# Read the long description from the README file.
-_setup_folder = os.path.dirname(__file__)
-with open(os.path.join(_setup_folder, "README.md"), encoding="utf-8") as readme_file:
-    long_description = readme_file.read()
+# Import the README and use it as the long-description.
+# Note: this will only work if 'README.md' is present in your MANIFEST.in file!
+
+try:
+    with open(os.path.join(here, "README.md"), encoding="utf-8") as f:
+        long_description = "\n" + f.read()
+except FileNotFoundError:
+    long_description = DESCRIPTION
+
+# Load the package's __version__.py module as a dictionary.
+about = {}
+if not VERSION:
+    with open(os.path.join(here, SRC_DIR, "__version__.py")) as f:
+        exec(f.read(), about)
+else:
+    about["__version__"] = VERSION
+
+
+class UploadCommand(Command):
+    """Support setup.py upload."""
+
+    description = "Build and publish the package."
+    user_options = []
+
+    @staticmethod
+    def status(s):
+        """Prints things in bold."""
+        print(f"\033[1m{s}\033[0m")
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        try:
+            self.status("Removing previous builds…")
+            rmtree(os.path.join(here, "dist"))
+        except OSError:
+            pass
+
+        self.status("Building Source and Wheel (universal) distribution…")
+        os.system(f"{sys.executable} setup.py sdist bdist_wheel --universal")
+
+        self.status("Uploading the package to PyPI via Twine…")
+        os.system("twine upload dist/*")
+
+        self.status("Pushing git tags…")
+        os.system("git tag v{}".format(about["__version__"]))
+        os.system("git push --tags")
+
+        sys.exit()
+
 
 setup(
-    name="pygount",
-    version=__version__,
-    description="count source lines of code (SLOC) using pygments",
+    name=NAME,
+    version=about["__version__"],
+    description=DESCRIPTION,
     long_description=long_description,
-    url="https://github.com/roskakori/pygount",
-    author="Thomas Aglassinger",
-    author_email="roskakori@users.sourceforge.net",
-    license="BSD",
+    long_description_content_type="text/markdown",
+    author=AUTHOR,
+    author_email=EMAIL,
+    license="MIT",
+    url=URL,
+    packages=find_packages(),
+    include_package_data=True,
+    zip_safe=False,
+    keywords=["html", "css", "inline", "style", "email"],
     classifiers=[
-        "Development Status :: 5 - Production/Stable",
-        "Environment :: Console",
+        "Environment :: Other Environment",
+        "Environment :: Web Environment",
         "Intended Audience :: Developers",
-        "License :: OSI Approved :: BSD License",
-        "Natural Language :: English",
+        "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
-        "Programming Language :: Python :: 3 :: Only",
-        "Programming Language :: Python :: 3.5",
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.8",
-        "Topic :: Software Development",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Topic :: Communications :: Email",
+        "Topic :: Text Processing :: Markup :: HTML",
     ],
-    keywords=["code analysis", "count", "SLOC"],
-    packages=find_packages(exclude=["tests"]),
-    install_requires=["pygments>=2.0"],
-    python_requires=">=3.5",
-    entry_points={"console_scripts": ["pygount=pygount.command:main"]},
+    install_requires=REQUIRED,
+    tests_require=TESTS,
+    extras_require=EXTRAS,
+    # $ setup.py upload support.
+    cmdclass={
+        "upload": UploadCommand,
+    },
 )
