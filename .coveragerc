@@ -1,9 +1,3 @@
-[run]
-source = streamparse
+[report]
 omit =
-    */python?.?/*
-    */lib-python/?.?/*.py
-    */lib_pypy/_*.py
-    */site-packages/ordereddict.py
-    */site-packages/nose/*
-    */unittest2/*
+    yaspin/signal_handlers.py

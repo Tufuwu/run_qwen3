@@ -1,33 +1,64 @@
-name: Python CI
-on: [push, pull_request]
+name: CI
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
 jobs:
   test:
-    runs-on: [self-hosted, arm64]
+    runs-on: ubuntu-latest
+    env:
+      PYTHONHASHSEED: '0'
     strategy:
       matrix:
-        python-version: [3.8, 3.8, 3.8, 3.8, pypy-3.6]
-        fast_finish: true
-        allow_failures:
-          - python-version: 3.8
-    container:
-      image: arm64v8/ubuntu:22.04
+        python-version: ["3.8", "3.8", "3.8", "3.9"]
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Python
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Cache pip
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/pip
-          key: ${{ matrix.python-version }}-pip
-          restore-keys: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
-          pip install --upgrade pip setuptools
-          pip install -r requirements.txt
-          pip install -r test-requirements.txt
-          python setup.py --version
+          make travis-setup
       - name: Run tests
-        run: pytest -vv
+        run: |
+          make ci
+
+  test-pypy-3.6:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONHASHSEED: '0'
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up PyPy3
+        uses: actions/setup-python@v2
+        with:
+          python-version: pypy-3.6
+      - name: Install dependencies
+        run: |
+          pip install termcolor==1.1.0 pytest==6.2.4 pytest-xdist==2.3.0 dataclasses==0.8
+      - name: Run tests
+        run: |
+          py.test -n auto
+
+  coverage:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONHASHSEED: '0'
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Install dependencies
+        run: |
+          make travis-setup
+      - name: Run coverage
+        run: |
+          make coverage
+      - name: Upload coverage
+        uses: codecov/codecov-action@v3
+
