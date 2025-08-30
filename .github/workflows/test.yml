@@ -1,15 +1,13 @@
-name: Python Tests
+name: Python package test
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  push
+  pull_request
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.8, 3.8, 3.8, 3.8, 3.8, 3.9]
+        python-version: [3.8, 3.8, 3.9]
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
@@ -18,12 +16,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        pip install .
-        pip install -r requirements.txt
-        pip install rednose coverage coveralls
+        pip install --upgrade pip
+        pip install -r requirements.txt .
     - name: Run tests
-      run: |
-        nosetests test --rednose --verbosity=3 --with-coverage --cover-package ncclient
-    - name: Upload coverage
-      run: coveralls
-      if: ${{ success }}
+      run: pytest
