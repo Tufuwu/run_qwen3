@@ -1,34 +1,24 @@
-name: CI
-on:
-  push:
-    branches:
-      - main
-
+name: Python CI
+on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python: ["3.8", "3.8"]
+        python-version: ['3.8', '3.8', '3.9', '3.10', '3.11']
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
-        fetch-depth: 10
-    - name: Setup Python
-      uses: actions/setup-python@v2
+        fetch-depth: false
+    - name: Set up Python
+      uses: actions/setup-python@v4
       with:
-        python-version: ${{ matrix.python }}
+        python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        sudo apt-get update
-        sudo apt-get install -y git build-essential automake libtool python-dev gettext swig
-        pip install flake8
-    - name: Run checks
+        pip install tox-travis
+    - name: Run tests
+      run: tox
+    - name: Slack notification
       run: |
-        flake8 --version
-        echo "compiling AutoBouquetsMaker enigma2 plugin"
-        python -m compileall .
-        find . -type f -name "*.po" -exec msgfmt {} -o {}.mo \;
-        flake8 --ignore=W191,E128,E501,E722 . --exit-zero
-        echo "done."
+        curl -X POST -H 'Content-Type: application/json' --data '{"text":"Build completed"}' ${{ secrets.SLACK_WEBHOOK_URL }}
