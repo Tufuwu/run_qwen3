@@ -1,5 +1,3 @@
-wget
-requests
-fire
-semantic_version
-coverage
+# pip dev/test dependencies
+flake8
+pytest

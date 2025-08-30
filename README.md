@@ -1,98 +1,140 @@
-# JILL.py
+# Trimmer
 
-[![py version](https://img.shields.io/pypi/pyversions/jill.svg?logo=python&logoColor=white)](https://pypi.org/project/jill)
-[![version](https://img.shields.io/pypi/v/jill.svg)](https://github.com/johnnychen94/jill.py/releases)
-[![Actions Status](https://github.com/johnnychen94/jill.py/workflows/Unit%20test/badge.svg
-)](https://github.com/johnnychen94/jill.py/actions)
-[![codecov](https://codecov.io/gh/johnnychen94/jill.py/branch/master/graph/badge.svg)](https://codecov.io/gh/johnnychen94/jill.py)
+[![ci](https://github.com/jonlabelle/Trimmer/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/jonlabelle/Trimmer/actions/workflows/ci.yml)
+[![AppVeyor Build status](https://ci.appveyor.com/api/projects/status/fdcdvfsip9d9efg3?svg=true)](https://ci.appveyor.com/project/jonlabelle/trimmer)
+[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/jonlabelle/Trimmer.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/jonlabelle/Trimmer/context:python)
+[![Package Control Installs](https://img.shields.io/packagecontrol/dt/Trimmer.svg?label=installs)](https://packagecontrol.io/packages/Trimmer)
+[![Latest Release](https://img.shields.io/github/tag/jonlabelle/Trimmer.svg?label=version)](https://github.com/jonlabelle/Trimmer/releases)
+[![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/jonlabelle/Trimmer/blob/master/LICENSE.md)
 
-The Python fork of [JILL](https://github.com/abelsiqueira/jill) - Julia Installer 4 Linux (and MacOS) - Light
+> [Trimmer](https://github.com/jonlabelle/Trimmer) is a [Sublime Text](http://www.sublimetext.com) plug-in for cleaning up whitespace.
 
 ## Features
 
-* download *latest* Julia release from *nearest* mirror server. Check [sources](jill/config/sources.json) for the list of all registered mirrors.
-* install julia for Linux and MacOS (including nightly build: `latest`)
-* easily set up a new release mirror 🚧
+- Trim whitespace at the end of each line.
+- Trim whitespace at the start of each line.
+- Trim whitespace at the start and end of each line.
+- Trim whitespace from selection(s).
+- Delete empty, whitespace only lines.
+- Collapse multiple consecutive empty lines into one empty line.
+- Collapse multiple consecutive spaces into one space.
+- Trim empty, whitespace only lines at the beginning and end of file.
+- Remove blank space characters.
+- Normalize spaces (consecutive spaces reduced, empty lines removed and lines trimmed).
+- Tokenize a string by collapsing consecutive spaces, and trimming leading and trailing spaces.
+- Delete empty, whitespace only HTML and XML tags.
+- Remove code comments and collapse lines.
 
-## Installation
+## Additional Features
 
-`pip install jill --user -U`
+A **Replace Smart Characters** command that performs the following actions:
 
-Note that `Python >= 3.6` is required.
+- **Smart single quotes:** `’` *to* `'`
+- **Smart double quotes:** `“` *to* `"`
+- **Prime:** `′` *to* `'`
+- **Double Prime:** `″` *to* `"`
+- **German quotes:** `„` *to* `"` and `‚` *to* `'`
+- **Ellipsis:** `…` *to* `...`
+- **Em dash:** `—` *to* `---`
+- **En dash:** `–` *to* `--`
+- **Bullet:** `•` *to* `*`
+- **Middle dot:** `·` *to* `-`
+- **Em space** *to* three spaces
+- **En space** *to* two spaces
+- **Non-breaking space** *to* one space
+- **Thin space** *to* one space
+- **Hair space** *to* one space
+- **Left angle quote:** `«` *to* `<<`
+- **Right angle quote:** `»` *to* `>>`
+- **Copyright symbol:** `©` *to* `(C)`
+- **Trademark symbol:** `™` *to* `(T)`
+- **Registered trademark symbol:** `®` *to* `(R)`
 
-## Basic usage examples
+![ScreenShot](https://raw.githubusercontent.com/jonlabelle/Trimmer/master/screenshots/command_palette.png)
 
-* download:
-    - latest stable release for current system: `jill download`
-    - latest `1.y` version: `jill download 1`
-    - latest `1.3.z` version: `jill download 1.3`
-    - from specific upstream: `jill download --upstream Official`
-    - specific release version: `jill download --version 1.3.0`
-    - specific system: `jill download --sys freebsd`
-    - specific architecture: `jill download --arch i686`
-    - download Julia to specific dir: `jill download --outdir another/dir`
-* install Julia for current system:
-    - system-wide: `sudo jill install` (make symlink in `/usr/bin`)
-    - only for current user: `jill install` (make symlink in `~/.local/bin`)
-    - don't need interactive promopt: `jill install --confirm`
-* check if there're new Julia versions:
-    - `jill update`
-    - add `--update` flag to `download` or `install` commands
-* find out all registered upstreams: `jill upstream`
-* check the not-so-elaborative documentation: `jill [COMMAND] -h` (e.g., `jill download -h`)
+Watch a [**Quick Demo**](https://raw.githubusercontent.com/jonlabelle/Trimmer/master/screenshots/demo.gif)
 
-## Mirror 🚧
+## Install
 
-`jill mirror [outdir]` downloads all Julia releases into `outdir`(default `./julia_pkg`)
+Trimmer is compatible with both Sublime Text 2 and 3 and all supported Operating Systems.
 
-You can create a `mirror.json` in current folder to override the default mirror
-behaviors. The [mirror configuration example](mirror.example.json) shows all possible
-configurable items, where only `version` is required.
+### Package Control
 
-## Register new mirror
+The easiest, and recommended way to install Trimmer is using [Package Control](https://packagecontrol.io).
 
-If it's an public mirror and you want to share it worldwide. You can add an entry to the
-[public registry](jill/config/sources.json), make a PR, then I will tag a new release for that.
+From the main application menu, navigate to:
 
-If it's an internal mirror and you don't plan to make it public, you can create a config
-file at `~/.config/jill/sources.json` locally. The contents will be appended to
-the public registry and overwrite already existing items if there are.
+- `Tools` -> `Command Palette...` -> `Package Control: Install Package`, type
+  the word ***Trimmer***, then select it to complete installation.
 
-In the registry config file, a new mirror is a dictionary in the `upstream` field:
+### Git
 
-* `name`: a distinguishable mirror name
-* `urls`: URL template to retrive Julia release
-* `latest_urls`: URL template to retrive the nightly build of Julia release
+To install Trimmer using Git, change to your **Sublime Text Packages** directory
+and clone the [Trimmer repository](https://github.com/jonlabelle/Trimmer).
 
-## Placeholders
+For example, on **OS X**... start a new **Terminal** session and enter the following
+commands:
 
-Placeholders are used to register new mirrors. For example, the stable release url of
-the "Official" release server owned by [JuliaComputing](https://juliacomputing.com) is
-`"https://julialang2.s3.amazonaws.com/bin/$sys/$arch/$minor_version/$filename"`
+```shell
+$ cd ~/Library/Application\ Support/Sublime\ Text\ 3/Packages/
+$ git clone https://github.com/jonlabelle/Trimmer
+```
 
-There're several predefined placeholders for various systems and architectures:
+### Manually
 
-* `system`: `windows`, `macos`, `linux`, `freebsd`
-* `sys`: `winnt`, `mac`, `linux`, `freebsd`
-* `os`: `win`, `mac`, `linux`, `freebsd`
-* `architecture`: `x86_64`, `i686`, `ARMv7`, `ARMv8`
-* `arch`: `x86`, `x64`, `armv7l`, `aarch64`
-* `osarch`: `win32`, `win64`, `mac64`, `linux-armv7l`, `linux-aarch64`
-* `osbit`: `win32`, `win64`, `linux32`, `linux64`, `linuxaarch64`
-* `bit`: `32`, `64`
-* `extension`: `exe`, `tar.gz`, `dmg` (no leading `.`)
+**Download** and **extract** the [zip](https://github.com/jonlabelle/Trimmer/zipball/master)
+or [tarball](https://github.com/jonlabelle/Trimmer/tarball/master) to your
+Sublime Text packages directory.
 
-There're also placeholders for versions:
+**Default Sublime Text Packages Paths:**
 
-* `patch_version`: `1.2.3`, `latest`
-* `minor_version`: `1.2`, `latest`
-* `major_version`: `1`
-* `version`: `v1.2.3-pre`, `latest`
-* `vpatch_version`: `v1.2.3`, `latest`
-* `vminor_version`: `v1.2`, `latest`
-* `vmajor_version`: `v1`, `latest`
+* **OS X:** `~/Library/Application Support/Sublime Text [2|3]/Packages`
+* **Linux:** `~/.Sublime Text [2|3]/Packages`
+* **Windows:** `%APPDATA%/Sublime Text [2|3]/Packages`
 
-To keep consistent names with official releases, you can use predefined name placeholders:
+> **NOTE** Replace the `[2|3]` part with the appropriate Sublime Text
+> version for your installation.
 
-* stable release `filename`: `julia-$patch_version-$osarch.$extension`
-* nightly release `latest_filename`: `"julia-latest-$osbit.$extension"`
+## Usage
+
+All commands are accessible from the **Command Palette** using prefix
+***Trimmer***, and in the **Main Menu** under `Edit` -> `Line` -> *Trimmer* command.
+
+- [Command Palette screenshot](https://raw.githubusercontent.com/jonlabelle/Trimmer/master/screenshots/command_palette.png)
+- [Main Menu screenshot](https://raw.githubusercontent.com/jonlabelle/Trimmer/master/screenshots/main_menu.png)
+
+### Key Bindings
+
+The *default* key binding will trim trailing whitespace at the end of each of
+line (entire file).
+
+- **OS X**: `Ctrl + S`
+- **Linux**: `Ctrl + Alt + S`
+- **Windows**: `Ctrl + Alt + S`
+
+### Trimmer Command API
+
+|              Command               |                                              Description                                               |          Context          |
+|------------------------------------|--------------------------------------------------------------------------------------------------------|---------------------------|
+| `trimmer`                          | trim whitespace at the end of each line                                                                | entire file               |
+| `trim_leading_whitespace`          | trim whitespace at the start of each line                                                              | selection, or entire file |
+| `trim_leading_trailing_whitespace` | trim whitespace at the start and end of each line                                                      | selection, or entire file |
+| `trim_selections`                  | trim whitespace from selection(s)                                                                      | selection                 |
+| `delete_empty_lines`               | delete empty, whitespace only lines                                                                    | selection, or entire file |
+| `collapse_lines`                   | collapse multiple consecutive empty lines into one empty line                                          | selection, or entire file |
+| `collapse_spaces`                  | collapse multiple consecutive spaces into one space                                                    | selection, or entire file |
+| `trim_edges`                       | trim empty, whitespace only lines at the beginning and end of the file                                 | entire file               |
+| `remove_blank_spaces`              | remove all blank space characters (tab, cr, ff, vt, space)                                             | selection, or entire file |
+| `normalize_spaces`                 | consecutive spaces reduced, empty lines removed and lines trimmed                                      | selection, or entire file |
+| `replace_smart_characters`         | replace smart characters (smart quotes, em/en dash, ellipsis, nbsp)                                    | selection, or entire file |
+| `tokenize_string`                  | convert a string to a token by collapsing consecutive spaces, and trimming leading and trailing spaces | selection, or entire file |
+| `delete_empty_tags`                | delete empty, whitespace only html and xml tags                                                        | selection, or entire file |
+| `remove_comments`                  | remove code comments and collapse lines                                                                | selection, or entire file |
+
+## Author
+
+[Jon LaBelle](https://jonlabelle.com)
+
+## License
+
+Trimmer is licensed under the [MIT license](http://opensource.org/licenses/MIT).
