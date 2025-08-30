@@ -1,31 +1,75 @@
-name: Python CI
-
-on: [push]
+name: CI
+on: [push, pull_request]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python: ["3.8", "3.8", "3.8"]
-        django: ["django21", "django22", "django30", "django31"]
-    env:
-      DJANGOVER: ${{ matrix.django }}
+        include:
+          - env: TOXENV=flake8
+          - python: 3.8
+            env: TOXENV=integration
+          - python: 3.8
+            env: TOXENV=py38-django22
+          - python: 3.8
+            env: TOXENV=py38-django22
+          - python: 3.8
+            env: TOXENV=py38-django22
+          - python: 3.8
+            env: TOXENV=py38-django22
+          - python: 3.9
+            env: TOXENV=py39-django22
+          - python: 3.8
+            env: TOXENV=py38-django30
+          - python: 3.8
+            env: TOXENV=py38-django30
+          - python: 3.8
+            env: TOXENV=py38-django30
+          - python: 3.9
+            env: TOXENV=py39-django30
+          - python: 3.8
+            env: TOXENV=py38-django31
+          - python: 3.8
+            env: TOXENV=py38-django31
+          - python: 3.8
+            env: TOXENV=py38-django31
+          - python: 3.9
+            env: TOXENV=py39-django31
+          - python: 3.8
+            env: TOXENV=py38-djangomain
+          - python: 3.8
+            env: TOXENV=py38-djangomain
+          - python: 3.8
+            env: TOXENV=py38-djangomain
+          - python: 3.9
+            env: TOXENV=py39-djangomain
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python }}
-    - name: Install dependencies
-      run: |
-        pip install tox coverage
-    - name: Set TOX_ENV
-      run: |
-        if [[ "${{ matrix.python }}" == "3.8" && $DJANGOVER ]]; then export TOX_ENV=py38-$DJANGOVER; fi
-        if [[ "${{ matrix.python }}" == "3.8" && $DJANGOVER ]]; then export TOX_ENV=py38-$DJANGOVER; fi
-        if [[ "${{ matrix.python }}" == "3.8" && $DJANGOVER ]]; then export TOX_ENV=py38-$DJANGOVER; fi
-    - name: Run tox
-      run: tox -r -e "$TOX_ENV"
-    - name: Upload coverage
-      uses: codecov/codecov-action@v1.0.0
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+        run: |
+          pip install tox
+      - name: Run tests
+        run: tox
+
+  allow_failure:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    strategy:
+      matrix:
+        include:
+          - python: 3.8
+            env: TOXENV=py38-djangomain
+          - python: 3.8
+            env: TOXENV=py38-djangomain
+          - python: 3.8
+            env: TOXENV=py38-djangomain
+          - python: 3.9
+            env: TOXENV=py39-djangomain
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+        run: |
+          pip install tox
+      - name: Run tests
+        run: tox
